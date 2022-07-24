@@ -3,9 +3,9 @@
 #ifndef _Eigen_Eigen_h
 #define _Eigen_Eigen_h
 
-#define EIGEN_MATRIX_PLUGIN 	<Eigen/ToStringPlugin.h>
-#define EIGEN_DENSEBASE_PLUGIN 	<Eigen/ToStringPlugin.h>
-#define EIGEN_TENSOR_PLUGIN		<Eigen/ToStringPlugin.h>
+#define EIGEN_MATRIX_PLUGIN 	<Eigen/Eigen/ToStringPlugin.h>
+#define EIGEN_DENSEBASE_PLUGIN 	<Eigen/Eigen/ToStringPlugin.h>
+#define EIGEN_TENSOR_PLUGIN		<Eigen/Eigen/ToStringPlugin.h>
 
 #define EIGEN_MPL2_ONLY
 
@@ -18,11 +18,11 @@
 #define eigen_assert(x) ASSERT(x)
 
 #undef Success  
-#include <plugin/eigen/Eigen/Dense>
-#include <plugin/eigen/unsupported/Eigen/NonLinearOptimization>
+#include <Eigen/plugin/eigen/Eigen/Dense>
+#include <Eigen/plugin/eigen/unsupported/Eigen/NonLinearOptimization>
 #undef Complex
-#include <plugin/eigen/unsupported/Eigen/FFT>
-#include <plugin/eigen/unsupported/Eigen/CXX11/Tensor>
+#include <Eigen/plugin/eigen/unsupported/Eigen/FFT>
+#include <Eigen/plugin/eigen/unsupported/Eigen/CXX11/Tensor>
 
 
 namespace Upp {
