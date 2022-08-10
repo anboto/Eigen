@@ -339,6 +339,27 @@ void Copy(const Range1& in, Range2 &out) {
 	std::copy(Begin(in), End(in), Begin(out));
 }
 
+template <class T>
+void Swap(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &A, int rc1, int rc2 = 0) {
+	Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> An(A.rows(), A.cols());
+	
+	for (int r = 0; r < A.rows(); ++r) {
+		for (int c = 0; c < A.cols(); ++c) {
+			int rn = r, cn = c;
+			if (rn == rc1)
+				rn = rc2;
+			else if (rn == rc2)
+				rn = rc1;
+			if (cn == rc1)
+				cn = rc2;
+			else if (cn == rc2)
+				cn = rc1;	 
+			An(rn, cn) = A(r, c);
+		}
+	}
+	A = pick(An);	
+}
+
 }
 
 #endif
