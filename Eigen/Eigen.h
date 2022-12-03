@@ -226,6 +226,13 @@ void Resize(Vector<T> &v, size_t len, const T& init) {
 	std::fill(v.begin(), v.end(), init);
 }
 template <typename T>
+void Resize(Array<T> &v, size_t len) {v.SetCount(int(len));}
+template <typename T>
+void Resize(Array<T> &v, size_t len, const T& init) {
+	v.SetCount(int(len));
+	std::fill(v.begin(), v.end(), init);
+}
+template <typename T>
 void ResizeConservative(Vector<T> &v, size_t len) {v.SetCount(int(len));}
 template <typename T>
 void ResizeConservative(Vector<T> &v, size_t len, const T& init) {v.SetCount(int(len), init);}
@@ -359,6 +366,11 @@ void Swap(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &A, int rc1, int rc2 
 	}
 	A = pick(An);	
 }
+
+template <class T>
+bool IsNull(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &a) {return a.size() == 0;}
+
+#define EigenNull	Eigen::MatrixXd()
 
 }
 
