@@ -11,6 +11,8 @@
 #ifndef EIGEN_REDUX_H
 #define EIGEN_REDUX_H
 
+#include "./InternalHeaderCheck.h"
+
 namespace Eigen { 
 
 namespace internal {
@@ -198,8 +200,7 @@ struct redux_impl<Func, Evaluator, DefaultTraversal, NoUnrolling>
   Scalar run(const Evaluator &eval, const Func& func, const XprType& xpr)
   {
     eigen_assert(xpr.rows()>0 && xpr.cols()>0 && "you are using an empty matrix");
-    Scalar res;
-    res = eval.coeffByOuterInner(0, 0);
+    Scalar res = eval.coeffByOuterInner(0, 0);
     for(Index i = 1; i < xpr.innerSize(); ++i)
       res = func(res, eval.coeffByOuterInner(0, i));
     for(Index i = 1; i < xpr.outerSize(); ++i)
@@ -238,7 +239,7 @@ struct redux_impl<Func, Evaluator, LinearVectorizedTraversal, NoUnrolling>
     const int packetAlignment = unpacket_traits<PacketScalar>::alignment;
     enum {
       alignment0 = (bool(Evaluator::Flags & DirectAccessBit) && bool(packet_traits<Scalar>::AlignedOnScalar)) ? int(packetAlignment) : int(Unaligned),
-      alignment = EIGEN_PLAIN_ENUM_MAX(alignment0, Evaluator::Alignment)
+      alignment = plain_enum_max(alignment0, Evaluator::Alignment)
     };
     const Index alignedStart = internal::first_default_aligned(xpr);
     const Index alignedSize2 = ((size-alignedStart)/(2*packetSize))*(2*packetSize);
@@ -353,12 +354,12 @@ struct redux_impl<Func, Evaluator, LinearVectorizedTraversal, CompleteUnrolling>
 };
 
 // evaluator adaptor
-template<typename _XprType>
-class redux_evaluator : public internal::evaluator<_XprType>
+template<typename XprType_>
+class redux_evaluator : public internal::evaluator<XprType_>
 {
-  typedef internal::evaluator<_XprType> Base;
+  typedef internal::evaluator<XprType_> Base;
 public:
-  typedef _XprType XprType;
+  typedef XprType_ XprType;
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
   explicit redux_evaluator(const XprType &xpr) : Base(xpr) {}
   

@@ -27,6 +27,8 @@
 
 #ifndef UNSUPPORTED_EIGEN_CXX11_SRC_TENSOR_TENSOR_REDUCTION_SYCL_HPP
 #define UNSUPPORTED_EIGEN_CXX11_SRC_TENSOR_TENSOR_REDUCTION_SYCL_HPP
+#include "./InternalHeaderCheck.h"
+
 namespace Eigen {
 namespace TensorSycl {
 namespace internal {
@@ -85,7 +87,7 @@ struct SecondStepFullReducer {
   SecondStepFullReducer(LocalAccessor scratch_, InputAccessor aI_, OutputAccessor outAcc_, OpType op_)
       : scratch(scratch_), aI(aI_), outAcc(outAcc_), op(OpDef::get_op(op_)) {}
 
-  void operator()(cl::sycl::nd_item<1> itemID) {
+  void operator()(cl::sycl::nd_item<1> itemID) const {
     // Our empirical research shows that the best performance will be achieved
     // when there is only one element per thread to reduce in the second step.
     // in this step the second step reduction time is almost negligible.
@@ -125,9 +127,8 @@ class FullReductionKernelFunctor {
   typedef typename OpDef::type Op;
   typedef typename Evaluator::EvaluatorPointerType EvaluatorPointerType;
   typedef typename Evaluator::PacketReturnType PacketReturnType;
-  typedef
-      typename ::Eigen::internal::conditional<(Evaluator::ReducerTraits::PacketAccess & Evaluator::InputPacketAccess),
-                                              PacketReturnType, CoeffReturnType>::type OutType;
+  typedef std::conditional_t<(Evaluator::ReducerTraits::PacketAccess & Evaluator::InputPacketAccess),
+                                              PacketReturnType, CoeffReturnType> OutType;
   typedef cl::sycl::accessor<OutType, 1, cl::sycl::access::mode::read_write, cl::sycl::access::target::local>
       LocalAccessor;
   LocalAccessor scratch;
@@ -140,11 +141,11 @@ class FullReductionKernelFunctor {
                              Index rng_, OpType op_)
       : scratch(scratch_), evaluator(evaluator_), final_output(final_output_), rng(rng_), op(OpDef::get_op(op_)) {}
 
-  void operator()(cl::sycl::nd_item<1> itemID) { compute_reduction(itemID); }
+  void operator()(cl::sycl::nd_item<1> itemID) const { compute_reduction(itemID); }
 
   template <bool Vect = (Evaluator::ReducerTraits::PacketAccess & Evaluator::InputPacketAccess)>
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE typename ::Eigen::internal::enable_if<Vect>::type compute_reduction(
-      const cl::sycl::nd_item<1> &itemID) {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE std::enable_if_t<Vect> compute_reduction(
+      const cl::sycl::nd_item<1> &itemID) const {
     auto output_ptr = final_output.get_pointer();
     Index VectorizedRange = (rng / Evaluator::PacketSize) * Evaluator::PacketSize;
     Index globalid = itemID.get_global_id(0);
@@ -182,8 +183,8 @@ class FullReductionKernelFunctor {
   }
 
   template <bool Vect = (Evaluator::ReducerTraits::PacketAccess & Evaluator::InputPacketAccess)>
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE typename ::Eigen::internal::enable_if<!Vect>::type compute_reduction(
-      const cl::sycl::nd_item<1> &itemID) {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE std::enable_if_t<!Vect> compute_reduction(
+      const cl::sycl::nd_item<1> &itemID) const {
     auto output_ptr = final_output.get_pointer();
     Index globalid = itemID.get_global_id(0);
     Index localid = itemID.get_local_id(0);
@@ -227,14 +228,16 @@ class GenericNondeterministicReducer {
         range(range_),
         num_values_to_reduce(num_values_to_reduce_) {}
 
-  void operator()(cl::sycl::nd_item<1> itemID) {
+  void operator()(cl::sycl::nd_item<1> itemID) const {
+    //This is to bypass the statefull condition in Eigen meanReducer
+    Op non_const_functor;
+    std::memcpy(&non_const_functor, &functor, sizeof (Op));
     auto output_accessor_ptr = output_accessor.get_pointer();
-    /// const cast added as a naive solution to solve the qualifier drop error
     Index globalid = static_cast<Index>(itemID.get_global_linear_id());
     if (globalid < range) {
       CoeffReturnType accum = functor.initialize();
       Eigen::internal::GenericDimReducer<Evaluator::NumReducedDims - 1, Evaluator, Op>::reduce(
-          evaluator, evaluator.firstInput(globalid), functor, &accum);
+          evaluator, evaluator.firstInput(globalid), non_const_functor, &accum);
       output_accessor_ptr[globalid] = OpDef::finalise_op(functor.finalize(accum), num_values_to_reduce);
     }
   }
@@ -280,7 +283,7 @@ struct PartialReductionKernel {
         num_coeffs_to_reduce(num_coeffs_to_reduce_) {}
 
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void element_wise_reduce(Index globalRId, Index globalPId,
-                                                                 CoeffReturnType &accumulator) {
+                                                                 CoeffReturnType &accumulator) const {
     if (globalPId >= num_coeffs_to_preserve) {
       return;
     }
@@ -297,7 +300,7 @@ struct PartialReductionKernel {
       global_offset += per_thread_global_stride;
     }
   }
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void operator()(cl::sycl::nd_item<1> itemID) {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void operator()(cl::sycl::nd_item<1> itemID) const {
     const Index linearLocalThreadId = itemID.get_local_id(0);
     Index pLocalThreadId = rt == reduction_dim::outer_most ? linearLocalThreadId % PannelParameters::LocalThreadSizeP
                                                            : linearLocalThreadId / PannelParameters::LocalThreadSizeR;
@@ -379,7 +382,7 @@ struct SecondStepPartialReduction {
         num_coeffs_to_preserve(num_coeffs_to_preserve_),
         num_coeffs_to_reduce(num_coeffs_to_reduce_) {}
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void operator()(cl::sycl::nd_item<1> itemID) {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void operator()(cl::sycl::nd_item<1> itemID) const {
     const Index globalId = itemID.get_global_id(0);
 
     if (globalId >= num_coeffs_to_preserve) return;
@@ -481,7 +484,7 @@ struct FullReducer<Self, Op, Eigen::SyclDevice, Vectorizable> {
   static EIGEN_CONSTEXPR bool HasOptimizedImplementation = true;
   static EIGEN_CONSTEXPR int PacketSize = Self::PacketAccess ? Self::PacketSize : 1;
   static void run(const Self &self, Op &reducer, const Eigen::SyclDevice &dev, EvaluatorPointerType data) {
-    typedef typename conditional<Self::PacketAccess, typename Self::PacketReturnType, CoeffReturnType>::type OutType;
+    typedef std::conditional_t<Self::PacketAccess, typename Self::PacketReturnType, CoeffReturnType> OutType;
     static_assert(!((EIGEN_SYCL_LOCAL_THREAD_DIM0 * EIGEN_SYCL_LOCAL_THREAD_DIM1) &
                     (EIGEN_SYCL_LOCAL_THREAD_DIM0 * EIGEN_SYCL_LOCAL_THREAD_DIM1 - 1)),
                   "The Local thread size must be a power of 2 for the reduction "

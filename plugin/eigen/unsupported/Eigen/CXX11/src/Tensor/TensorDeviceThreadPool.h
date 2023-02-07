@@ -10,6 +10,8 @@
 #if defined(EIGEN_USE_THREADS) && !defined(EIGEN_CXX11_TENSOR_TENSOR_DEVICE_THREAD_POOL_H)
 #define EIGEN_CXX11_TENSOR_TENSOR_DEVICE_THREAD_POOL_H
 
+#include "./InternalHeaderCheck.h"
+
 namespace Eigen {
 
 // Runs an arbitrary function and then calls Notify() on the passed in
@@ -122,6 +124,11 @@ struct ThreadPoolDevice {
     ::memset(buffer, c, n);
   }
 
+  template<typename T>
+  EIGEN_STRONG_INLINE void fill(T* begin, T* end, const T& value) const {
+    std::fill(begin, end, value);
+  }
+
   EIGEN_STRONG_INLINE int numThreads() const {
     return num_threads_;
   }
@@ -139,6 +146,10 @@ struct ThreadPoolDevice {
   EIGEN_STRONG_INLINE size_t lastLevelCacheSize() const {
     // The l3 cache size is shared between all the cores.
     return l3CacheSize() / num_threads_;
+  }
+  
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void synchronize() const {
+    // Nothing.  Threadpool device operations are synchronous.
   }
 
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE int majorDeviceVersion() const {

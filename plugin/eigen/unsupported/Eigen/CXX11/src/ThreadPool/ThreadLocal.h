@@ -18,10 +18,7 @@
 
 #else
 
-#if EIGEN_MAX_CPP_VER >= 11 &&                         \
-    ((EIGEN_COMP_GNUC && EIGEN_GNUC_AT_LEAST(4, 8)) || \
-     __has_feature(cxx_thread_local)                || \
-     (EIGEN_COMP_MSVC >= 1900) )
+#if ((EIGEN_COMP_GNUC) || __has_feature(cxx_thread_local) || EIGEN_COMP_MSVC )
 #define EIGEN_THREAD_LOCAL static thread_local
 #endif
 
@@ -34,8 +31,7 @@
 #endif
 // Checks whether C++11's `thread_local` storage duration specifier is
 // supported.
-#if defined(__apple_build_version__) &&     \
-    ((__apple_build_version__ < 8000042) || \
+#if EIGEN_COMP_CLANGAPPLE && ((EIGEN_COMP_CLANGAPPLE < 8000042) || \
      (TARGET_OS_IPHONE && __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_9_0))
 // Notes: Xcode's clang did not support `thread_local` until version
 // 8, and even then not for all iOS < 9.0.
@@ -61,6 +57,8 @@
 #endif  // defined(__ANDROID__) && defined(__clang__)
 
 #endif  // EIGEN_AVOID_THREAD_LOCAL
+
+#include "./InternalHeaderCheck.h"
 
 namespace Eigen {
 

@@ -17,13 +17,13 @@ vectors, numerical solvers and related algorithms.]&]
 [s0; [C2 -|Matrix2d res `= a`*b;-|// Just multiply them using `*]&]
 [s0;#2 &]
 [s0;#2 &]
-[s0;# [2 Eigen package is a wrapper of Eigen library, updated to stable 
-][^https`:`/`/eigen`.tuxfamily`.org`/index`.php`?title`=ChangeLog`#Eigen`_3`.4`.0^2 r
-elease 3.4.0 (18/08/2021)][2 . It includes the library and helper 
-functions to integrate better Eigen with U`+`+. Starting from 
-the 3.1.1 version, it is licensed under the ][^http`:`/`/www`.mozilla`.org`/MPL`/2`.0`/^2 M
-PL2][2 , which is a simple weak copyleft license. Common questions 
-about the MPL2 are answered in the official ][^http`:`/`/www`.mozilla`.org`/MPL`/2`.0`/FAQ`.html^2 M
+[s0;# [2 Eigen package is a wrapper of Eigen library, updated to unstable 
+3.4.90 (git rev 67eeba6e720c5745abc77ae6c92ce0a44aa7b7ae). It 
+includes the library and helper functions to integrate better 
+Eigen with U`+`+. Starting from the 3.1.1 version, it is licensed 
+under the ][^http`:`/`/www`.mozilla`.org`/MPL`/2`.0`/^2 MPL2][2 , 
+which is a simple weak copyleft license. Common questions about 
+the MPL2 are answered in the official ][^http`:`/`/www`.mozilla`.org`/MPL`/2`.0`/FAQ`.html^2 M
 PL2 FAQ][2 .]&]
 [s0;#2 &]
 [s0;# [2 Bazaar/Eigen package includes a sample package (Eigen`_demo) 
