@@ -218,26 +218,20 @@ void Serialize(Stream& stream, Eigen::Matrix<T, Eigen::Dynamic, 1> &vec) {
 
 // These functions serve both for Eigen, std and U++ Vectors
 
-template <typename T>
-void Resize(Vector<T> &v, size_t len) {v.SetCount(int(len));}
-template <typename T>
-void Resize(Vector<T> &v, size_t len, const T& init) {
+template <class Range>
+void Resize(Range &v, size_t len) {v.SetCount(int(len));}
+template <class Range>
+void Resize(Range &v, size_t len, const typename Range::value_type& init) {
 	v.SetCount(int(len));
 	std::fill(v.begin(), v.end(), init);
 }
-template <typename T>
-void Resize(Array<T> &v, size_t len) {v.SetCount(int(len));}
-template <typename T>
-void Resize(Array<T> &v, size_t len, const T& init) {
-	v.SetCount(int(len));
-	std::fill(v.begin(), v.end(), init);
-}
-template <typename T>
-void ResizeConservative(Vector<T> &v, size_t len) {v.SetCount(int(len));}
-template <typename T>
-void ResizeConservative(Vector<T> &v, size_t len, const T& init) {v.SetCount(int(len), init);}
-template <typename T>
-void Clear(Vector<T> &v) {v.Clear();}
+
+template <class Range>
+void ResizeConservative(Range &v, size_t len) {v.SetCount(int(len));}
+template <class Range>
+void ResizeConservative(Range &v, size_t len, const typename Range::value_type& init) {v.SetCount(int(len), init);}
+template <class Range>
+void Clear(Range &v) {v.Clear();}
 
 template <typename T>
 void Resize(Eigen::Matrix<T, Eigen::Dynamic, 1> &v, size_t len) {v.resize(len);}
@@ -287,24 +281,14 @@ void Clear(std::vector<T> &v) {v.clear();}
 #define PostPad ResizeConservative
 
 
-template <typename T>
-auto Begin(const Vector<T> &v)			{return v.Begin();}
-template <typename T>
-auto Begin(Vector<T> &v)				{return v.Begin();}
-template <typename T>
-auto End(const Vector<T> &v)			{return v.End();}
-template <typename T>
-auto End(Vector<T> &v)					{return v.End();}
-
-
-template <typename T>
-auto Begin(const Array<T> &v)			{return v.Begin();}
-template <typename T>
-auto Begin(Array<T> &v)					{return v.Begin();}
-template <typename T>
-auto End(const Array<T> &v)				{return v.End();}
-template <typename T>
-auto End(Array<T> &v)					{return v.End();}
+template <class Range>
+auto Begin(const Range &v)				{return v.Begin();}
+template <class Range>
+auto Begin(Range &v)					{return v.Begin();}
+template <class Range>
+auto End(const Range &v)				{return v.End();}
+template <class Range>
+auto End(Range &v)						{return v.End();}
 
 template <typename T>
 auto Begin(const std::vector<T> &v)		{return v.begin();}
@@ -326,10 +310,10 @@ auto &First(Range &data) {return data[0];}
 template <class Range>
 auto &Last(Range &data) {return data[data.size()-1];}
 
-template <typename T>
-void Reverse(Vector<T> &v) {
-	T *first = v.begin();
-	T *last = v.end();
+template <class Range>
+void Reverse(Range &v) {
+	typename Range::value_type *first = v.begin();
+	typename Range::value_type *last = v.end();
 	while ((first != last) && (first != --last)) 
 		Swap(*first++, *last);
 }
@@ -367,6 +351,25 @@ void Swap(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &A, int rc1, int rc2 
 	}
 	A = pick(An);	
 }
+
+template <typename T>
+inline Eigen::Matrix<T, Eigen::Dynamic, 1> Segment(const Eigen::Matrix<T, Eigen::Dynamic, 1> &d, int ifrom, int num) {
+	return d.segment(ifrom, num);
+}
+
+template <typename T>
+inline std::vector<T> Segment(const std::vector<T> &d, int ifrom, int num) {
+	return std::vector<T>(d.begin() + ifrom, d.begin() + ifrom + num);
+}
+
+template <class Range>
+inline Range Segment(const Range &d, int ifrom, int num) {
+	Range a;
+	Resize(a, num);
+	std::copy(Begin(d) + ifrom, Begin(d) + ifrom + num, Begin(a));
+	return a;
+}
+
 
 template <class T>
 bool IsNull(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &a) {return a.size() == 0;}
