@@ -483,7 +483,7 @@ CONSOLE_APP_MAIN
 		VectorXf b = VectorXf::Random(5);
 		UppLog() << "\nHere is the right hand side b:\n" << b;
 		UppLog() << "\nThe least-squares solution is:\n"
-		       << A.jacobiSvd(ComputeThinU | ComputeThinV).solve(b);
+		       << A.template bdcSvd<ComputeThinU | ComputeThinV>().solve(b);
 	}
 	UppLog() << "\n\nSeparating the computation from the construction";
 	{
