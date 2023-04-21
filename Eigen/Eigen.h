@@ -370,6 +370,21 @@ inline Range Segment(const Range &d, int ifrom, int num) {
 	return a;
 }
 
+template <class Range>
+inline Range Left(const Range &d, int num) {
+	Range a;
+	Resize(a, num);
+	std::copy(Begin(d), Begin(d) + num, Begin(a));
+	return a;
+}
+
+template <class Range>
+inline Range Right(const Range &d, int num) {
+	Range a;
+	Resize(a, num);
+	std::copy(Begin(d) + d.size() - num, Begin(d) + d.size(), Begin(a));
+	return a;
+}
 
 template <class T>
 bool IsNull(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &a) {return a.size() == 0;}
