@@ -46,12 +46,12 @@ struct NonLinearOptimizationFunctor {
 	typedef Eigen::Matrix<double, InputsAtCompileTime, 1> InputType;
 	typedef Eigen::Matrix<double, ValuesAtCompileTime, 1> ValueType;
 	typedef Eigen::Matrix<double, ValuesAtCompileTime, InputsAtCompileTime> JacobianType;
-
+	
 	Eigen::Index unknowns, datasetLen;
-
+	
 	NonLinearOptimizationFunctor() : unknowns(InputsAtCompileTime), datasetLen(ValuesAtCompileTime) {}
 	NonLinearOptimizationFunctor(int unknowns, int datasetLen) : unknowns(unknowns), datasetLen(datasetLen) {}
-
+	
 	ptrdiff_t inputs() const {return ptrdiff_t(unknowns);}
 	ptrdiff_t values() const {return ptrdiff_t(datasetLen);}
 	virtual void operator() (const InputType& , ValueType* , JacobianType*  = 0) const {};
@@ -69,7 +69,7 @@ bool NonLinearOptimization(Eigen::VectorXd &y, Eigen::Index numData,
 bool SolveNonLinearEquations(Eigen::VectorXd &y, Function <int(const Eigen::VectorXd &b, Eigen::VectorXd &residual)> Residual,
 			double xtol = Null, int maxfev = Null, double factor = Null);
 double SolveNonLinearEquation(double y, Function <double(double b)> Residual, double xtol = Null, int maxfev = Null, double factor = Null);
-
+	
 template <class T>
 void Xmlize(XmlIO &xml, Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &mat) {
 	Size_<int64> sz(mat.cols(), mat.rows());
@@ -365,14 +365,26 @@ inline std::vector<T> Segment(const std::vector<T> &d, int ifrom, int num) {
 template <class Range>
 inline Range Segment(const Range &d, int ifrom, int num) {
 	Range a;
+	if (ifrom + num >= d.size()) {
+		num = d.size() - ifrom;
+		if (num <= 0)
+			return a;
+	}
 	Resize(a, num);
 	std::copy(Begin(d) + ifrom, Begin(d) + ifrom + num, Begin(a));
 	return a;
 }
 
 template <class Range>
+inline Range Mid(const Range &d, int ifrom, int num) {return Segment(d, ifrom, num);}
+
+template <class Range>
 inline Range Left(const Range &d, int num) {
 	Range a;
+	if (num >= d.size()) {
+		a = clone(d);
+		return a; 
+	}
 	Resize(a, num);
 	std::copy(Begin(d), Begin(d) + num, Begin(a));
 	return a;
@@ -381,9 +393,29 @@ inline Range Left(const Range &d, int num) {
 template <class Range>
 inline Range Right(const Range &d, int num) {
 	Range a;
+	if (num >= d.size()) {
+		a = clone(d);
+		return a; 
+	}
 	Resize(a, num);
 	std::copy(Begin(d) + d.size() - num, Begin(d) + d.size(), Begin(a));
 	return a;
+}
+
+template <typename T>
+inline void Remove(Vector<T> &d, int id) {d.Remove(id);}
+
+template <typename T>
+inline void Remove(Eigen::Matrix<T, Eigen::Dynamic, 1> &d, int id) {
+	Eigen::Index sz = d.size();
+	Eigen::Index right = sz-id-1;
+	d.segment(id, right) = d.segment(id+1, right);
+	d.conservativeResize(sz-1);
+}
+
+template <class Range>
+inline void Remove(Range &d, int id) {
+	d.erase(d.begin() + id);
 }
 
 template <class T>
