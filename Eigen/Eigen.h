@@ -332,24 +332,17 @@ void Copy(const Range1& in, Range2 &out) {
 }
 
 template <class T>
-void Swap(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &A, int rc1, int rc2 = 0) {
-	Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> An(A.rows(), A.cols());
+void Swap(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &A, int rc1, int rc2) {
+ 	A.row(rc1).swap(A.row(rc2));	// Swap rows rc1 and rc2
+ 	A.col(rc1).swap(A.col(rc2));	// Swap columns rc1 and rc2
+}
 
-	for (int r = 0; r < A.rows(); ++r) {
-		for (int c = 0; c < A.cols(); ++c) {
-			int rn = r, cn = c;
-			if (rn == rc1)
-				rn = rc2;
-			else if (rn == rc2)
-				rn = rc1;
-			if (cn == rc1)
-				cn = rc2;
-			else if (cn == rc2)
-				cn = rc1;	 
-			An(rn, cn) = A(r, c);
-		}
-	}
-	A = pick(An);
+template <class T>
+void Swap(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &A1, Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &A2, int rc1, int rc2) {
+	ASSERT(A1.rows() == A2.rows() && A1.cols() == A2.cols());
+	
+	A1.row(rc1).swap(A2.row(rc2));
+    A1.col(rc1).swap(A2.col(rc2));	
 }
 
 template <typename T>
