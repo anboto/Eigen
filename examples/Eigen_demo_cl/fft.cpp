@@ -77,7 +77,7 @@ void FFTTests()
 	    str << "Time" << csvSep << "Data" << csvSep << "Filtered data";
 	    double t = 0;
 	    for (int i = 0; i < numData; ++i, t = i*1/samplingFrecuency) 
-	       	str << "\n" << t << csvSep << timebuf[i] << csvSep << timebuf2[i];;
+	       	str << "\n" << t << csvSep << timebuf[i] << csvSep << timebuf2[i];
 	    String dataFileName = GetExeDirFile("data.csv");
 	    UppLog() << "\nSource data saved in '" << dataFileName << "'";
 	    VERIFY(SaveFile(dataFileName, str));

@@ -14,7 +14,7 @@ b << 5, 6,
 Matrix2d res = a*b;    // Just multiply them using *
 ```
 
-[Eigen U++](https://anboto.github.io/srcdoc$Eigen$Eigen$en-us.html) package is a wrapper of Eigen library, updated to stable [release 3.4.0 (18/08/2021)](https://eigen.tuxfamily.org/index.php?title=ChangeLog#Eigen_3.4.0). It includes the library and helper functions to integrate better Eigen with U++. Starting from the 3.1.1 version, it is licensed under the[ MPL2](http://www.mozilla.org/MPL/2.0/), which is a simple weak copyleft license. Common questions about the MPL2 are answered in the official [MPL2 FAQ](http://www.mozilla.org/MPL/2.0/FAQ.html).
+[Eigen U++](https://anboto.github.io/srcdoc$Eigen$Eigen$en-us.html) package is a wrapper of Eigen library, updated to commit fee5d60b (26/12/2023).
 
 examples/Eigen package includes a sample package (Eigen_demo) to ease its use for U++ users. It has many samples from Eigen library and nonlinear equation solving and optimization like [Eckerle4](http://www.itl.nist.gov/div898/strd/nls/data/eckerle4.shtml) and [Thurber](http://www.itl.nist.gov/div898/strd/nls/data/thurber.shtml). To simplify access to these features, simple functions have been added.
 
