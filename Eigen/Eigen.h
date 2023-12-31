@@ -324,6 +324,17 @@ void Reverse(std::vector<T> &v) {std::reverse(v.begin(), v.end());}
 template <typename T>
 void Reverse(Eigen::Matrix<T, Eigen::Dynamic, 1> &v) {v.reverseInPlace();}
 
+template <class Range>
+void CopyRowMajor(Range &in, int nrows, int ncols, Eigen::Matrix<typename Range::value_type, Eigen::Dynamic, Eigen::Dynamic> &out) {
+	out = Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>(Begin(in), nrows, ncols);
+}
+
+template <class Range>
+void CopyRowMajor(const Eigen::Matrix<typename Range::value_type, Eigen::Dynamic, Eigen::Dynamic> &in, Range &out) {
+	Resize(out, in.size());
+	typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> RowMajMat;
+	RowMajMat::Map(Begin(out), in.rows(), in.cols()) = in;
+}
 
 template <class Range1, class Range2>
 void Copy(const Range1& in, Range2 &out) {
