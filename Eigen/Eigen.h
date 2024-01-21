@@ -365,7 +365,7 @@ void ColMajorToRowMajor(const T *d_col, T *d_row, const Vector<int> &dims) {
 	Vector<int> idx;
 	row.ResetIndex(idx);
 	do {
-		d_row[col.GetIndex(idx)] = d_col[row.GetIndex(idx)];
+		d_row[row.GetIndex(idx)] = d_col[col.GetIndex(idx)];
 	} while(row.IncrementIndex(idx));
 }
 
