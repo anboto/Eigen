@@ -24,6 +24,7 @@
 #include <plugin/eigen/unsupported/Eigen/FFT>
 #include <plugin/eigen/unsupported/Eigen/CXX11/Tensor>
 
+#include "MultiDimMatrixIndex.h"
 
 namespace Upp {
 
@@ -310,23 +311,31 @@ auto &First(Range &data) {return data[0];}
 template <class Range>
 auto &Last(Range &data) {return data[data.size()-1];}
 
+template <typename T>			// To avoid problem with Upp
+void ReverseX(std::vector<T> &v) {std::reverse(v.begin(), v.end());}
+
+template <typename T>			// To avoid problem with Upp
+void ReverseX(Eigen::Matrix<T, Eigen::Dynamic, 1> &v) {v.reverseInPlace();}
+
+template <typename T>			// To avoid problem with Upp
+void ReverseX(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &v) {v.reverseInPlace();}
+
 template <class Range>
-void Reverse(Range &v) {
+void ReverseX(Range &v) {		// To avoid problem with Upp
 	typename Range::value_type *first = v.begin();
 	typename Range::value_type *last = v.end();
 	while ((first != last) && (first != --last)) 
 		Swap(*first++, *last);
 }
 
-template <typename T>
-void Reverse(std::vector<T> &v) {std::reverse(v.begin(), v.end());}
-
-template <typename T>
-void Reverse(Eigen::Matrix<T, Eigen::Dynamic, 1> &v) {v.reverseInPlace();}
-
 template <class Range>
 void CopyRowMajor(Range &in, int nrows, int ncols, Eigen::Matrix<typename Range::value_type, Eigen::Dynamic, Eigen::Dynamic> &out) {
 	out = Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>(Begin(in), nrows, ncols);
+}
+
+template <typename T>
+void CopyRowMajor(T *in, int nrows, int ncols, Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &out) {
+	out = Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>(in, nrows, ncols);
 }
 
 template <class Range>
@@ -334,6 +343,30 @@ void CopyRowMajor(const Eigen::Matrix<typename Range::value_type, Eigen::Dynamic
 	Resize(out, in.size());
 	typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> RowMajMat;
 	RowMajMat::Map(Begin(out), in.rows(), in.cols()) = in;
+}
+
+template <typename T>
+void RowMajorToColMajor(const T *d_row, T *d_col, const Vector<int> &dims) {
+	MultiDimMatrixIndex row, col;
+	row.RowMajor().SetAxis(dims);
+	col.ColMajor().SetAxis(dims);
+	Vector<int> idx;
+	row.ResetIndex(idx);
+	do {
+		d_col[col.GetIndex(idx)] = d_row[row.GetIndex(idx)];
+	} while(row.IncrementIndex(idx));
+}
+
+template <typename T>
+void ColMajorToRowMajor(const T *d_col, T *d_row, const Vector<int> &dims) {
+	MultiDimMatrixIndex row, col;
+	row.RowMajor().SetAxis(dims);
+	col.ColMajor().SetAxis(dims);
+	Vector<int> idx;
+	row.ResetIndex(idx);
+	do {
+		d_row[col.GetIndex(idx)] = d_col[row.GetIndex(idx)];
+	} while(row.IncrementIndex(idx));
 }
 
 template <class Range1, class Range2>
@@ -427,6 +460,25 @@ bool IsNull(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &a) {return a.size(
 
 #define EigenNull	Eigen::MatrixXd()
 
+template<typename T>
+using  MatrixType = Eigen::Matrix<T,Eigen::Dynamic, Eigen::Dynamic>;
+   
+template<typename Scalar, int rank, typename sizeType>
+auto TensorToMatrix(const Eigen::Tensor<Scalar,rank> &tensor, const sizeType rows, const sizeType cols) { 
+    return Eigen::Map<const MatrixType<Scalar>> (tensor.data(), rows, cols);
+}
+
+template<typename Scalar, typename... Dims>
+auto MatrixToTensor(const MatrixType<Scalar> &matrix, Dims... dims) {
+    constexpr int rank = sizeof... (Dims);
+    return Eigen::TensorMap<Eigen::Tensor<const Scalar, rank>>(matrix.data(), {dims...});
+}
+
+template<typename T>
+decltype(auto) TensorLayoutSwap(T&& t) {
+	return Eigen::TensorLayoutSwapOp<typename std::remove_reference<T>::type>(t);
+}
+ 
 }
 
 

@@ -15,8 +15,8 @@ struct SerialTest {
 	VectorXd v;
 	SerialTest() : m(2, 2), v(3){}
 	void Print() {
-		Cout() << "\nHere is the matrix:\n" << m;
-		Cout() << "\nHere is the vector:\n" << v;
+		UppLog() << "\nHere is the matrix:\n" << m;
+		UppLog() << "\nHere is the vector:\n" << v;
 	}
 	void Serialize(Stream& stream) {
 		::Serialize(stream, m);
@@ -35,7 +35,9 @@ CONSOLE_APP_MAIN
 	StdLogSetup(LOG_COUT|LOG_FILE);
 	
 	UppLog() << "Eigen library demo";
-	
+	UppLog() << "Version " << EIGEN_WORLD_VERSION << "." << EIGEN_MAJOR_VERSION << "." << EIGEN_MINOR_VERSION;
+ 
+    
 	// https://eigen.tuxfamily.org/dox/group__TutorialMatrixClass.html
 	UppLog() << "\n\nTutorial page 1 - The Matrix class";
 	
@@ -698,6 +700,233 @@ CONSOLE_APP_MAIN
 		LoadFromFile(serialTest_s, GetExeDirFile("Serial.dat"));
 		UppLog() << "\nSerialization demo";
 		serialTest_s.Print();
+	}
+	
+	UppLog() << "\n\nTensor tests";
+	{
+		{
+			Eigen::Tensor<int, 2> A(2, 3);
+		    Eigen::Tensor<int, 2> B(3, 2);
+		    A.setValues({{1, 1, 1}, {1, 1, 1}});
+		    B.setValues({{1, 1}, {2, 2}, {3, 3}});
+		    
+		    Tensor<double, 3> mat(3, 3, 3);
+	    	mat.setZero();
+	    	mat(1, 1, 1) = 1.0;
+			
+			// Map a tensor of ints on top of stack-allocated storage.
+			int storage[128];  // 2 x 4 x 2 x 8 = 16 x 8 = 128
+			TensorMap<Tensor<int, 4, RowMajor>> t_4d(storage, 2, 4, 2, 8);
+			
+			// The same storage can be viewed as a different tensor.
+			TensorMap<Tensor<int, 2>> t_2d(storage, {16, 8})	;	// You can also pass the sizes as an array.
+		    t_4d.setConstant(123456);
+			UppLog() << "\n" << t_2d(3, 2);
+			
+			// Increase the rank of the input tensor by introducing two new dimensions (same size)
+			Eigen::array<int, 4> redim{{4, 4, 4, 2}};
+			Tensor<int, 4> red = t_2d.reshape(redim);
+		}
+		{	    
+		    Tensor<Upp::String, 1> sdata(2);
+		    sdata.setValues({"Hello", "Eigen Tensor World!"});
+		    VERIFY(sdata(1).Find("Tensor") >= 0);
+		
+		    Tensor<char, 2> cdata(2, 2);
+		    cdata.setValues({{'a', 'b'}, {'c', 'd'}});
+		    UppLog() << "\nC2: " << cdata;
+			VERIFY(cdata(0, 0) == 'a');
+		
+		    Tensor<float, 6> fdata(2, 2, 2, 2, 2, 2);
+		    fdata.setZero();
+		    VERIFY(fdata(0, 0, 0, 0, 0, 0) == 0.0);
+		}
+	    {
+			int size = 60;
+			Tensor<bool, 3> mat(3, 4, 5);
+			mat.setConstant(true);
+			UppLog() << "\nI size: " << mat.size();
+			UppLog() << "\nI dim 1: " << mat.dimension(0);
+			UppLog() << "\nI dim 2: " << mat.dimension(1);
+			UppLog() << "\nI dim 3: " << mat.dimension(2);
+			UppLog() << "\nI element: " << mat(0, 1, 2);
+			
+			for(Eigen::Index i = 0; i < mat.dimension(0); i++) 
+		        UppLog() << i << "\n : " << mat(i, 0, 0);
+		
+		    VERIFY(mat.size() == size);
+		    VERIFY(mat.dimension(0)*mat.dimension(1)*mat.dimension(2) == mat.size());
+	    }
+	    {
+	       	Tensor<float, 2> mat(3, 3);
+		    mat.setConstant(123.45);
+		
+		    Tensor<float, 2> mats = mat + 2.0f;
+		    Tensor<float, 2> matp = mat * 2.0f;
+		
+		    UppLog() << "\n" << mats;
+		    UppLog() << "\n" << matp;
+		}
+		{
+			Tensor<std::complex<double>, 2> mat(3, 3);
+		    mat.setConstant(std::complex<double>(1, 0));
+		    UppLog() << "\n" << mat;
+		
+		    Tensor<double, 2> matd = mat.real();
+		    UppLog() << "\n" << matd;
+		
+		    Tensor<float, 2> matf = matd.cast<float>();
+		    UppLog() << "\n" << matf;
+		
+		    VERIFY(mat(0, 0).real() == matf(0, 0));
+		}
+		{
+		 	Tensor<double, 2> mat(2,2);
+		    UppLog() << "\nJ size: " << mat.size();
+		    UppLog() << "\nJ Empty: " << mat;
+		    mat.setConstant(1.0);
+		    UppLog() << "\nJ Filled: " << mat;
+		    mat.resize(3,3);
+		    UppLog() << "\nJ size: " << mat.size();
+		    UppLog() << "\nJ : " << mat;
+		}
+		{
+		 	Eigen::Tensor<float, 2> matf(3, 3);
+		    Eigen::Tensor<int, 2> mati(3, 3);
+		    Eigen::Tensor<bool, 2> matb(3, 3);
+		
+		    matf.setConstant(1.0);
+		    mati.setConstant(1);
+		    matb.setConstant(true);
+		    UppLog() << "\n" << matf;
+		    UppLog() << "\n" << mati;
+		    UppLog() << "\n" << matb;
+		
+		    Eigen::Tensor<float, 2> x1 = - matf;
+		    Eigen::Tensor<int, 2> x2 = - mati;
+		    Eigen::Tensor<bool, 2> x3 = - matb;
+		    UppLog() << "\n" << x1;
+		    UppLog() << "\n" << x2;
+		    UppLog() << "\n" << x3;
+		}
+		{
+		    Eigen::Tensor<float, 2> h(3, 3);
+		    Eigen::Tensor<float, 2> f1(3, 3);
+		    Eigen::Tensor<float, 2> f2(3, 3);
+		    Eigen::Tensor<bool, 2> t1(3, 3);
+		    Eigen::Tensor<bool, 2> t2(3, 3);
+		    Eigen::Tensor<bool, 2> t3(3, 3);
+		    Eigen::Tensor<bool, 2> t4(3, 3);
+		
+		    h.setConstant(0.5);
+		    f1.setConstant(123.45);
+		    f2.setConstant(123.45);
+		
+		    t1 = f1 > h;
+		    t2 = f2 > h;
+		
+		    t3 = t1 && t2;
+		    t4 = t1 || t2;
+		
+		    UppLog() << "\nH: " << "\n" << h;
+		    UppLog() << "\nF1: " << "\n" << f1;
+		    UppLog() << "\nF2: " << "\n" << f2;
+		    UppLog() << "\nT1: " << "\n" << t1;
+		    UppLog() << "\nT2: " << "\n" << t2;
+		    UppLog() << "\nT3: " << "\n" << t3;
+		    UppLog() << "\nT4: " << "\n" << t4;
+		}
+		{
+			Eigen::Tensor<float, 2> t1(3, 3);
+			Eigen::Tensor<float, 2> t2(3, 3);
+			Eigen::Tensor<float, 2> t3(3, 3);
+			Eigen::Tensor<float, 2> t4(3, 3);
+			Eigen::Tensor<float, 2> t5(3, 3);
+			Eigen::Tensor<float, 2> t6(3, 3);
+			
+			for (int j = 0; j< 3; j++) 
+			    for (int k = 0; k< 3; k++) 
+			        t1(j, k) = j * 3 + k + 1;
+			
+			for (int j = 0; j< 3; j++) 
+			    for (int k = 0; k< 3; k++) 
+			        t2(j, k) = k * 3 + j + 1;
+			
+			t3 = t1 + t2;
+			t4 = t1 - t2;
+			t5 = t1 / t2;
+			t6 = t1 * t2;
+			
+			UppLog() << "\nT1: " << "\n" << t1;
+			UppLog() << "\nT2: " << "\n" << t2;
+			UppLog() << "\nT3: " << "\n" << t3;
+			UppLog() << "\nT4: " << "\n" << t4;
+			UppLog() << "\nT5: " << "\n" << t5;
+			UppLog() << "\nT6: " << "\n" << t6;
+			
+		}
+		{
+			Eigen::Tensor<double, 3> mat(3,3,3);
+			mat.setZero();
+			mat(0,1,2) = 1;
+			mat(1,2,0) = 1;
+			mat(2,0,1) = 1;
+			mat(1,0,2) = -1;
+			mat(2,1,0) = -1;
+			mat(0,2,1) = -1;
+			Eigen::Tensor<double, 4> data(3,3,3,3);
+			data.setZero();
+			
+			for (int i = 0; i < 3; i++) 
+			  for (int j = 0; j < 3; j++) 
+			    for (int k = 0; k < 3; k++) 
+			      for (int l = 0; l < 3; l++) 
+			        for (int m = 0; m < 3; m++) 
+			          data(i,j,l,m) += mat(i,j,k) * mat(k,l,m);
+			
+			for (int i = 0; i < 3; i++) 
+			  for (int j = 0; j < 3; j++) 
+			    for (int l = 0; l < 3; l++) 
+			      for (int m = 0; m < 3; m++) 
+			        VERIFY(data(i,j,l,m) == (int(i == l) * int(j == m) - int(i == m) * int(j == l)));
+			
+			VERIFY(mat.dimension(0) == 3);
+			VERIFY(mat.dimension(1) == 3);
+			VERIFY(mat.dimension(2) == 3);
+			auto dims = mat.dimensions();
+			VERIFY(dims[0] == 3);
+			VERIFY(dims[1] == 3);
+			VERIFY(dims[2] == 3);
+		}
+		{		
+		    Eigen::Tensor<double,4> mat4 (2,2,2,2);
+		    mat4.setConstant(123.45);
+		
+		    Eigen::MatrixXd         mat  = TensorToMatrix(mat4, 4, 4);
+		    Eigen::Tensor<double,3> mat3 = MatrixToTensor(mat, 2, 2, 4);
+		
+		    UppLog() << "\n" << mat3;
+		}
+		{
+			Eigen::Tensor<double, 3> mat(3, 2, 2);
+			mat.setConstant(123.45);
+			Eigen::array<Eigen::Index, 3> offset = {0, 0, 0};
+			Eigen::array<Eigen::Index, 3> extent = {1, 2, 2};
+			Eigen::Tensor<double, 3> res = mat.slice(offset, extent);  
+			MatrixXd slc = TensorToMatrix(res, 2, 2);
+			UppLog() << "\n" << slc;
+		}
+		{
+			Eigen::Tensor<double, 3, RowMajor> mat(3, 2, 2);
+			mat.setConstant(123.45);
+			Eigen::Tensor<double, 3> mapped = TensorLayoutSwap(mat);
+			
+			Eigen::array<Eigen::Index, 3> offset = {0, 0, 0};
+			Eigen::array<Eigen::Index, 3> extent = {1, 2, 2};
+			Eigen::Tensor<double, 3> res = mapped.slice(offset, extent);  
+			MatrixXd slc = TensorToMatrix(res, 2, 2);
+			UppLog() << "\n" << slc;
+		}
 	}
 	
 	NonLinearTests();
