@@ -328,6 +328,36 @@ void ReverseX(Range &v) {		// To avoid problem with Upp
 		Swap(*first++, *last);
 }
 
+template <typename T>			
+void Rotate(std::vector<T> &v, int shift) {
+	if (shift > 0)
+		std::rotate(v.begin(), v.begin() + shift, v.end());
+	else if (shift < 0)
+		std::rotate(v.rbegin(), v.rbegin() - shift, v.rend());
+}
+
+template <class Range>			
+void Rotate(Range &v, int k) {
+	auto rotate = [](Range &v, int start, int end) {
+	    while (start < end) {
+	        Swap(v[start], v[end]);
+	        start++;
+	        end--;
+	    }
+	};
+	int n = v.size();
+	k = k % n;  // Handle cases where k is greater than the array size
+	if (k > 0) {
+	    rotate(v, 0, n - 1);
+	    rotate(v, 0, k - 1);
+	    rotate(v, k, n - 1);
+	} else if (k > 0) {
+	    rotate(v, 0, k - 1);
+	    rotate(v, k, n - 1);
+	    rotate(v, 0, n - 1);
+	}
+}
+
 template <class Range>
 void CopyRowMajor(Range &in, int nrows, int ncols, Eigen::Matrix<typename Range::value_type, Eigen::Dynamic, Eigen::Dynamic> &out) {
 	out = Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>(Begin(in), nrows, ncols);
