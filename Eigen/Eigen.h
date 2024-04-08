@@ -375,30 +375,6 @@ void CopyRowMajor(const Eigen::Matrix<typename Range::value_type, Eigen::Dynamic
 	RowMajMat::Map(Begin(out), in.rows(), in.cols()) = in;
 }
 
-template <typename T>
-void RowMajorToColMajor(const T *d_row, T *d_col, const Vector<int> &dims) {
-	MultiDimMatrixIndex row, col;
-	row.RowMajor().SetAxis(dims);
-	col.ColMajor().SetAxis(dims);
-	Vector<int> idx;
-	row.ResetIndex(idx);
-	do {
-		d_col[col.GetIndex(idx)] = d_row[row.GetIndex(idx)];
-	} while(row.IncrementIndex(idx));
-}
-
-template <typename T>
-void ColMajorToRowMajor(const T *d_col, T *d_row, const Vector<int> &dims) {
-	MultiDimMatrixIndex row, col;
-	row.RowMajor().SetAxis(dims);
-	col.ColMajor().SetAxis(dims);
-	Vector<int> idx;
-	row.ResetIndex(idx);
-	do {
-		d_row[row.GetIndex(idx)] = d_col[col.GetIndex(idx)];
-	} while(row.IncrementIndex(idx));
-}
-
 template <class Range1, class Range2>
 void Copy(const Range1& in, Range2 &out) {
 	Resize(out, in.size());

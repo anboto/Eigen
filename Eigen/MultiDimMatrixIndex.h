@@ -3,6 +3,8 @@
 #ifndef _ScatterDraw_MultiDimMatrixIndex_h_
 #define _ScatterDraw_MultiDimMatrixIndex_h_
 
+#include <Eigen/Eigen.h>
+
 namespace Upp {
 
 class MultiDimMatrixIndex {
@@ -18,6 +20,9 @@ public:
 		ASSERT(axis >= 0 && axis < axisDim.size() && dim > 0);
 		axisDim[axis] = dim;
 	}
+	void InsertAxis(int axis, int dim) {
+		axisDim.Insert(axis, dim);
+	}
 	template<typename... Args>
 	MultiDimMatrixIndex &SetAxis(int t, Args... args) {
 		ASSERT(t > 0);
@@ -25,7 +30,6 @@ public:
 		SetAxis(args...);
 		return *this;
 	}
-
 	MultiDimMatrixIndex &SetAxis(const Vector<int> &dim) {
 		axisDim = clone(dim);
 		return *this;
@@ -175,6 +179,10 @@ public:
 		d.Alloc(index.size());
 	}
 	
+	void InsertAxis(int axis, int dim) {
+		index.InsertAxis(axis, dim);
+	}
+	
 	inline int GetNumAxis() const	{return index.GetNumAxis();}
 		
     T& operator()(int row, int col) {
@@ -186,16 +194,42 @@ public:
         return d[index(row, col)];
     }
     
+    T& operator()(const Vector<int> &indx) {
+        ASSERT(index.IsValid(indx));
+        return d[index.GetIndex(indx)];
+    }
+    const T& operator()(const Vector<int> &indx) const {
+        ASSERT(index.IsValid(indx));
+        return d[index.GetIndex(indx)];
+    }
+    
     template<typename... Args>
 	T &operator()(Args... args) {
 		ASSERT(index.IsValid(args...));
 		return d[index.GetIndex(args...)];
 	}
-	
 	template<typename... Args>
 	const T &operator()(Args... args) const {
 		ASSERT(index.IsValid(args...));
 		return d[index.GetIndex(args...)];
+	}
+	
+	Eigen::MatrixXd block(const Vector<int> &indx, int idrow, int wrow, int idcol, int wcol) {
+		ASSERT(indx.size() == GetNumAxis());
+		ASSERT(idrow >= 0 && idcol >= 0);
+		ASSERT(indx[idrow]+wrow < size(idrow));
+		ASSERT(indx[idcol]+wcol < size(idcol));
+		
+		Eigen::MatrixXd ret(wrow, wcol);	
+		Vector<int> id = clone(indx);
+		
+		for (int r = 0; r < wrow; ++r, id[idrow]++) {
+			id[idcol] = indx[idcol];
+			for (int c = 0; c < wcol; ++c, id[idcol]++) 
+				ret(r, c) = d[index.GetIndex(id)];
+		}
+		
+		return ret;
 	}
 	
 	const T *begin() const		{return d.begin();}
@@ -218,9 +252,32 @@ public:
 	MultiDimMatrixRowMajor() 				{this->RowMajor();};
 	template<typename... Args>
 	MultiDimMatrixRowMajor(Args... args) 	{this->RowMajor(); this->Resize(args...);}
-	
 };
-	
+
+template <typename T>
+void RowMajorToColMajor(const T *d_row, T *d_col, const Vector<int> &dims) {
+	MultiDimMatrixIndex row, col;
+	row.RowMajor().SetAxis(dims);
+	col.ColMajor().SetAxis(dims);
+	Vector<int> idx;
+	row.ResetIndex(idx);
+	do {
+		d_col[col.GetIndex(idx)] = d_row[row.GetIndex(idx)];
+	} while(row.IncrementIndex(idx));
+}
+
+template <typename T>
+void ColMajorToRowMajor(const T *d_col, T *d_row, const Vector<int> &dims) {
+	MultiDimMatrixIndex row, col;
+	row.RowMajor().SetAxis(dims);
+	col.ColMajor().SetAxis(dims);
+	Vector<int> idx;
+	row.ResetIndex(idx);
+	do {
+		d_row[row.GetIndex(idx)] = d_col[col.GetIndex(idx)];
+	} while(row.IncrementIndex(idx));
+}
+
 }
 
 #endif
