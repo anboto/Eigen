@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
-// Copyright 2021 - 2022, the Anboto author and contributors
-#ifndef _ScatterDraw_MultiDimMatrixIndex_h_
-#define _ScatterDraw_MultiDimMatrixIndex_h_
+// Copyright 2021 - 2024, the Anboto author and contributors
+#ifndef _ScatterDraw_MultiDimMatrix_h_
+#define _ScatterDraw_MultiDimMatrix_h_
 
 #include <Eigen/Eigen.h>
 
@@ -114,7 +114,8 @@ public:
 	int GetNumData() const {
 		int ret = 1;
 		for (auto dim : axisDim)
-			ret *= dim;
+			if (dim > 0)
+				ret *= dim;
 		return ret;
 	}
 	int size() const			{return GetNumData();}
@@ -214,13 +215,13 @@ public:
 		return d[index.GetIndex(args...)];
 	}
 	
-	Eigen::MatrixXd block(const Vector<int> &indx, int idrow, int wrow, int idcol, int wcol) {
+	Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> block(const Vector<int> &indx, int idrow, int wrow, int idcol, int wcol) {
 		ASSERT(indx.size() == GetNumAxis());
 		ASSERT(idrow >= 0 && idcol >= 0);
 		ASSERT(indx[idrow]+wrow < size(idrow));
 		ASSERT(indx[idcol]+wcol < size(idcol));
 		
-		Eigen::MatrixXd ret(wrow, wcol);	
+		Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> ret(wrow, wcol);	
 		Vector<int> id = clone(indx);
 		
 		for (int r = 0; r < wrow; ++r, id[idrow]++) {
@@ -228,7 +229,6 @@ public:
 			for (int c = 0; c < wcol; ++c, id[idcol]++) 
 				ret(r, c) = d[index.GetIndex(id)];
 		}
-		
 		return ret;
 	}
 	

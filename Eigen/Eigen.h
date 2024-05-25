@@ -24,7 +24,7 @@
 #include <plugin/eigen/unsupported/Eigen/FFT>
 #include <plugin/eigen/unsupported/Eigen/CXX11/Tensor>
 
-#include "MultiDimMatrixIndex.h"
+#include "MultiDimMatrix.h"
 
 namespace Upp {
 

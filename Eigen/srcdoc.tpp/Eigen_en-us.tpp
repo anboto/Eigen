@@ -16,16 +16,26 @@ vectors, numerical solvers and related algorithms.]&]
 [s0; [C2 -|-|7, 8;]&]
 [s0; [C2 -|Matrix2d res `= a`*b;-|// Just multiply them using `*]&]
 [s0;#2 &]
+[s0;# [2 Starting from the 3.1.1 version, it is licensed under the 
+][^http`:`/`/www`.mozilla`.org`/MPL`/2`.0`/^2 MPL2][2 , which is 
+a simple weak copyleft license. Common questions about the MPL2 
+are answered in the official ][^http`:`/`/www`.mozilla`.org`/MPL`/2`.0`/FAQ`.html^2 M
+PL2 FAQ][2 .]&]
 [s0;#2 &]
 [s0;# [2 Eigen package is a wrapper of Eigen library, updated to commit 
 fee5d60b (26/12/2023). It includes the library and helper functions 
-to integrate better Eigen with U`+`+. Starting from the 3.1.1 
-version, it is licensed under the ][^http`:`/`/www`.mozilla`.org`/MPL`/2`.0`/^2 MPL
-2][2 , which is a simple weak copyleft license. Common questions 
-about the MPL2 are answered in the official ][^http`:`/`/www`.mozilla`.org`/MPL`/2`.0`/FAQ`.html^2 M
-PL2 FAQ][2 .]&]
+to integrate better Eigen with U`+`+, like:]&]
+[s0;#i150;O0; [^topic`:`/`/Eigen`/src`/NonLinear`_en`-us^2 Non linear 
+equations solving]&]
+[s0;#i150;O0; [^topic`:`/`/Eigen`/src`/MultiDimMatrix`_en`-us^2 MultiDimMatrix]&]
+[s0;#i150;O0; [^topic`:`/`/Eigen`/src`/MultiDimMatrixRowMajor`_en`-us^2 MultiDimMatrixR
+owMajor]&]
+[s0;#i150;O0; [^topic`:`/`/Eigen`/src`/MultiDimMatrixIndex`_en`-us^2 MultiDimMatrixInde
+x]&]
+[s0;#i150;O0; [^topic`:`/`/Eigen`/src`/MultiDimMatrixIndexRowMajor`_en`-us^2 MultiDimMa
+trixRowMajor]&]
 [s0;#2 &]
-[s0;# [2 Bazaar/Eigen package includes a sample package (Eigen`_demo) 
+[s0;# [2 Anboto/Eigen package includes a sample package (Eigen`_demo) 
 to ease its use for U`+`+ users. It has many samples from Eigen 
 library and nonlinear equation solving and optimization like 
 ][^http`:`/`/www`.itl`.nist`.gov`/div898`/strd`/nls`/data`/eckerle4`.shtml^2 Eckerl

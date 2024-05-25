@@ -6,7 +6,7 @@ topic "";
 [ $$0,0#00000000000000000000000000000000:Default]
 [{_}%EN-US 
 [ {{10000@(113.42.0) [s0; [*@2;4 Nonlinear functions]]}}&]
-[s0;*@3;4 &]
+[s3; &]
 [s0; [2 Some functions have been include to ease nonlinear optimization 
 and equation system solving.]&]
 [s0;2 &]
