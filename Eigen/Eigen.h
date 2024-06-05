@@ -381,6 +381,14 @@ void Copy(const Range1& in, Range2 &out) {
 	std::copy(Begin(in), End(in), Begin(out));
 }
 
+template <class Range1, class Range2>
+void Block(Range1& in, Range2& out, int begin, int len) {
+	ASSERT(begin < in.size() && len > 0 && begin + len < in.size());
+	Resize(out, len);
+	std::copy(in + begin, in + begin + len, Begin(out));
+}
+
+
 template <class T>
 void Swap(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &A, int rc1, int rc2) {
  	A.row(rc1).swap(A.row(rc2));	// Swap rows rc1 and rc2

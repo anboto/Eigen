@@ -111,14 +111,16 @@ public:
 	inline bool IsValid(int row, int col) const  {
 		return row >= 0 && row < axisDim[0] && col >= 0 && col < axisDim[1];
 	}
-	int GetNumData() const {
-		int ret = 1;
+	int size() const {
+		int ret = 0;
 		for (auto dim : axisDim)
-			if (dim > 0)
+			if (dim > 0) {
+				if (ret == 0)
+					ret = 1;
 				ret *= dim;
+			}
 		return ret;
 	}
-	int size() const			{return GetNumData();}
 	int size(int dim) const		{return axisDim[dim];}
 	
 	MultiDimMatrixIndex &ColMajor(bool c = true)	{colMajor = c;	return *this;}
