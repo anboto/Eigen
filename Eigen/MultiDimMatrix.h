@@ -112,13 +112,11 @@ public:
 		return row >= 0 && row < axisDim[0] && col >= 0 && col < axisDim[1];
 	}
 	int size() const {
-		int ret = 0;
+		if (axisDim.size() == 0)
+			return 0;
+		int ret = 1;
 		for (auto dim : axisDim)
-			if (dim > 0) {
-				if (ret == 0)
-					ret = 1;
-				ret *= dim;
-			}
+			ret *= dim;
 		return ret;
 	}
 	int size(int dim) const		{return axisDim[dim];}
@@ -169,7 +167,10 @@ class MultiDimMatrix {
 public:
 	MultiDimMatrix()			  	{};
 	template<typename... Args>
-	MultiDimMatrix(Args... args)  	{index.SetAxis(args...);}
+	MultiDimMatrix(Args... args) {
+		index.SetAxis(args...);
+		d.Alloc(index.size());
+	}
 	
 	template<typename... Args>
 	void Resize(int t, Args... args) {
