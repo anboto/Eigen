@@ -53,7 +53,7 @@ void FFTTests()
 	VectorXd timebuf2(numData);
 	fft.inv(timebuf2, freqbuf2);
 	
-	String csvSep = ";";
+	String csvSep = ",";
 
 	// Saving original and filtered FFT
 	{
