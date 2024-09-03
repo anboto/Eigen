@@ -57,6 +57,14 @@ public:
 			return index;
 		}
 	}
+	template<typename T>
+	int GetIndex(T t) const {
+		Vector<int> index;
+		
+	    AddIndex(index, t);
+	
+	    return GetIndex(index);
+	}
 	template<typename T, typename... Args>
 	int GetIndex(T t, Args... args) const {
 		Vector<int> index;
@@ -77,6 +85,12 @@ public:
 	void ResetIndex(Vector<int> &idx) const {
 		idx.SetCount(axisDim.size(), 0);
 	}
+	Vector<int> ResetIndex() const {
+		Vector<int> idx;
+		idx.SetCount(axisDim.size(), 0);
+		return idx;
+	}
+	
 	bool IncrementIndex(Vector<int> &idx) const {
 		ASSERT(idx.size() == axisDim.size());
 		for (int i = 0; i < axisDim.size(); ++i) {
@@ -86,6 +100,20 @@ public:
 			idx[i] = 0;
 		}
 		return false;
+	}
+	
+	bool IncrementIndexRows(Vector<int> &idx) const {
+		return IncrementIndexRowsDim(idx) >= 0;
+	}	
+	int IncrementIndexRowsDim(Vector<int> &idx) const {
+		ASSERT(idx.size() == axisDim.size());
+		for (int i = axisDim.size()-1; i >= 0; --i) {
+			idx[i]++;
+			if (idx[i] < axisDim[i])
+				return i;
+			idx[i] = 0;
+		}
+		return -1;
 	}
 		
 	template<typename... Args>
@@ -111,6 +139,9 @@ public:
 	inline bool IsValid(int row, int col) const  {
 		return row >= 0 && row < axisDim[0] && col >= 0 && col < axisDim[1];
 	}
+	inline bool IsValid(int row) const  {
+		return row >= 0 && row < axisDim[0];
+	}
 	int size() const {
 		if (axisDim.size() == 0)
 			return 0;
@@ -120,6 +151,8 @@ public:
 		return ret;
 	}
 	int size(int dim) const		{return axisDim[dim];}
+	int dims() const			{return axisDim.size();}
+	const Vector<int> &GetDims(){return axisDim;}
 	
 	MultiDimMatrixIndex &ColMajor(bool c = true)	{colMajor = c;	return *this;}
 	MultiDimMatrixIndex &RowMajor(bool c = true)	{colMajor = !c;	return *this;}
@@ -235,6 +268,33 @@ public:
 		return ret;
 	}
 	
+	String ToString() const {
+		String r;
+	    Vector<int> idx = index.ResetIndex();
+	    int num_dims = index.dims();
+	
+	    Function<void(int, int)> PrintRecursively;
+	    PrintRecursively = [&](int dim, int elem_count) {
+	        if (dim > 0 && r[r.GetCount()-1] != '[') 
+	        	r << "\n" << String(' ', dim);
+	        r << "[";
+	
+	        if (dim == num_dims - 1) {
+	            for (int i = 0; i < index.size(dim); i++) {
+	                if (i) 
+	                	r << " ";
+	                r << d[elem_count + i];
+	            }
+	        } else {
+	            for (int i = 0; i < index.size(dim); i++) 
+	                PrintRecursively(dim + 1, elem_count + i * index.size(dim + 1));
+	        }
+	        r << "]";
+	    };
+	    PrintRecursively(0, 0);
+	    return r;
+	}
+		
 	const T *begin() const		{return d.begin();}
 	T *begin() 					{return d.begin();}
 	
@@ -243,6 +303,8 @@ public:
 	
 	int size() const			{return index.size();}
 	int size(int dim) const		{return index.size(dim);}
+	int dims() const			{return index.dims();}
+	const Vector<int> &GetDims(){return index.GetDims();}
 
 protected:
     Buffer<T> d;
@@ -262,8 +324,7 @@ void RowMajorToColMajor(const T *d_row, T *d_col, const Vector<int> &dims) {
 	MultiDimMatrixIndex row, col;
 	row.RowMajor().SetAxis(dims);
 	col.ColMajor().SetAxis(dims);
-	Vector<int> idx;
-	row.ResetIndex(idx);
+	Vector<int> idx = row.ResetIndex();
 	do {
 		d_col[col.GetIndex(idx)] = d_row[row.GetIndex(idx)];
 	} while(row.IncrementIndex(idx));
@@ -274,8 +335,7 @@ void ColMajorToRowMajor(const T *d_col, T *d_row, const Vector<int> &dims) {
 	MultiDimMatrixIndex row, col;
 	row.RowMajor().SetAxis(dims);
 	col.ColMajor().SetAxis(dims);
-	Vector<int> idx;
-	row.ResetIndex(idx);
+	Vector<int> idx = row.ResetIndex();
 	do {
 		d_row[row.GetIndex(idx)] = d_col[col.GetIndex(idx)];
 	} while(row.IncrementIndex(idx));
