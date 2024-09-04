@@ -9,12 +9,13 @@ namespace Upp {
 
 class MultiDimMatrixIndex {
 public:
-	MultiDimMatrixIndex()			   {};
+	MultiDimMatrixIndex()			   	{};
 	template<typename... Args>
-	MultiDimMatrixIndex(Args... args)  {SetAxis(args...);}
+	MultiDimMatrixIndex(Args... args)  	{SetAxis(args...);}
 	
-	void SetNumAxis(int numAxis)	   {axisDim.SetCount(numAxis);};
-	inline int GetNumAxis() const  	   {return axisDim.size();}
+	void SetNumAxis(int numAxis)	   	{axisDim.SetCount(numAxis);};
+	inline int GetNumAxis() const  	   	{return axisDim.size();}
+	const Vector<int> &GetAxisDim()	   	{return axisDim;}
 	
 	void SetAxisDim(int axis, int dim) {
 		ASSERT(axis >= 0 && axis < axisDim.size() && dim > 0);
@@ -34,8 +35,6 @@ public:
 		axisDim = clone(dim);
 		return *this;
 	}
-			
-	Vector<int> &GetAxisDim()	{return axisDim;};
 	
 	int GetIndex(const Vector<int> &idx) const {
 		ASSERT(IsValid(idx));
@@ -151,8 +150,6 @@ public:
 		return ret;
 	}
 	int size(int dim) const		{return axisDim[dim];}
-	int dims() const			{return axisDim.size();}
-	const Vector<int> &GetDims(){return axisDim;}
 	
 	MultiDimMatrixIndex &ColMajor(bool c = true)	{colMajor = c;	return *this;}
 	MultiDimMatrixIndex &RowMajor(bool c = true)	{colMajor = !c;	return *this;}
@@ -220,8 +217,21 @@ public:
 		index.InsertAxis(axis, dim);
 	}
 	
-	inline int GetNumAxis() const	{return index.GetNumAxis();}
-		
+	void SetNumAxis(int numAxis)	   	{index.SetNumAxis(numAxis);};
+	inline int GetNumAxis() const  	   	{return index.GetNumAxis();}
+	const Vector<int> &GetAxisDim()	   	{return index.GetAxisDim();}
+	
+	MultiDimMatrix &SetZero() {
+		memset(d.begin(), 0, size()*sizeof(T));
+		return *this;
+	}
+	MultiDimMatrix &SetConstant(const T &val) {
+		int sz = size();
+		for (int i = 0; i < sz; ++i)
+			d[i] = val;
+		return *this;
+	}
+	
     T& operator()(int row, int col) {
         ASSERT(index.IsValid(row, col));
         return d[index(row, col)];
@@ -271,7 +281,7 @@ public:
 	String ToString() const {
 		String r;
 	    Vector<int> idx = index.ResetIndex();
-	    int num_dims = index.dims();
+	    int num_dims = index.GetNumAxis();
 	
 	    Function<void(int, int)> PrintRecursively;
 	    PrintRecursively = [&](int dim, int elem_count) {
@@ -303,8 +313,6 @@ public:
 	
 	int size() const			{return index.size();}
 	int size(int dim) const		{return index.size(dim);}
-	int dims() const			{return index.dims();}
-	const Vector<int> &GetDims(){return index.GetDims();}
 
 protected:
     Buffer<T> d;
