@@ -142,7 +142,7 @@ public:
 		return row >= 0 && row < axisDim[0];
 	}
 	int size() const {
-		if (axisDim.size() == 0)
+		if (IsEmpty())
 			return 0;
 		int ret = 1;
 		for (auto dim : axisDim)
@@ -150,6 +150,7 @@ public:
 		return ret;
 	}
 	int size(int dim) const		{return axisDim[dim];}
+	bool IsEmpty() const		{return axisDim.IsEmpty();}
 	
 	MultiDimMatrixIndex &ColMajor(bool c = true)	{colMajor = c;	return *this;}
 	MultiDimMatrixIndex &RowMajor(bool c = true)	{colMajor = !c;	return *this;}
@@ -313,6 +314,7 @@ public:
 	
 	int size() const			{return index.size();}
 	int size(int dim) const		{return index.size(dim);}
+	bool IsEmpty() const		{return index.IsEmpty();}
 
 protected:
     Buffer<T> d;
