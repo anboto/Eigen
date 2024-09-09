@@ -248,9 +248,11 @@ void ResizeConservative(Eigen::Matrix<T, Eigen::Dynamic, 1> &v, size_t len, cons
 		std::fill(&v[len0], v.data() + len, init);
 }
 template <typename T>
-void Clear(Eigen::Matrix<T, Eigen::Dynamic, 1> &v) {v.resize(0);}
+void Clear(Eigen::Matrix<T, Eigen::Dynamic, 1> &v) 				{v.resize(0);}
 template <typename T>
 void Clear(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &m) {m.resize(0, 0);}
+template <typename T, int NumIndices_>
+void Clear(Eigen::Tensor<T, NumIndices_> &m) 					{m = Eigen::Tensor<T, NumIndices_>();}
 
 template <typename T>
 void PrePad(Eigen::Matrix<T, Eigen::Dynamic, 1> &v, size_t len, const T& init) {

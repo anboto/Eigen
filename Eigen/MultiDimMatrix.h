@@ -89,6 +89,7 @@ public:
 		idx.SetCount(axisDim.size(), 0);
 		return idx;
 	}
+	void Clear()	{axisDim.Clear();}
 	
 	bool IncrementIndex(Vector<int> &idx) const {
 		ASSERT(idx.size() == axisDim.size());
@@ -212,6 +213,10 @@ public:
 	void Resize(const Vector<int> &dim) {
 		index.SetAxis(dim);
 		d.Alloc(index.size());
+	}
+	void Clear() {
+		index.Clear();
+		d.Clear();
 	}
 	
 	void InsertAxis(int axis, int dim) {
