@@ -64,4 +64,12 @@ double SolveNonLinearEquation(double y, Function <double(double b)> Residual, do
 	return Null;		
 }
 
+Eigen::Matrix3d SkewSymmetricMatrix(const Eigen::Vector3d& r) {
+    Eigen::Matrix3d s;
+    s << 0, -r.z(), r.y(),
+         r.z(), 0, -r.x(),
+        -r.y(), r.x(), 0;
+    return s;
+}
+
 }

@@ -321,6 +321,18 @@ public:
 	int size(int dim) const		{return index.size(dim);}
 	bool IsEmpty() const		{return index.IsEmpty();}
 
+	void Xmlize(XmlIO xml) {
+		xml
+			("index", index)
+			("d", d)	
+		;	
+	}
+	void Jsonize(JsonIO& json) {
+		json
+			("index", index)
+			("d", d)	
+		;	
+	}
 protected:
     Buffer<T> d;
 	MultiDimMatrixIndex index;

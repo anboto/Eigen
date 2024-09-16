@@ -70,6 +70,8 @@ bool NonLinearOptimization(Eigen::VectorXd &y, Eigen::Index numData,
 bool SolveNonLinearEquations(Eigen::VectorXd &y, Function <int(const Eigen::VectorXd &b, Eigen::VectorXd &residual)> Residual,
 			double xtol = Null, int maxfev = Null, double factor = Null);
 double SolveNonLinearEquation(double y, Function <double(double b)> Residual, double xtol = Null, int maxfev = Null, double factor = Null);
+
+Eigen::Matrix3d SkewSymmetricMatrix(const Eigen::Vector3d& r);		// Antisymmetric matrix from 3d vector
 	
 template <class T>
 void Xmlize(XmlIO &xml, Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &mat) {
@@ -123,6 +125,27 @@ void Xmlize(XmlIO &xml, Eigen::Matrix<T, Eigen::Dynamic, 1> &vec) {
 	}
 }
 
+template <typename T, int NumIndices>
+void Jsonize(JsonIO &io, Eigen::Tensor<T, NumIndices> &mat) {
+	Array<T> vector;
+	Vector<int64> vsz(NumIndices);
+	for (int i = 0; i < NumIndices; ++i)
+		vsz[i] = mat.dimension(i);
+	io("size", vsz);
+	if(io.IsStoring()) {
+		vector.SetCount(mat.size());
+		Copy(mat, vector);
+		io("data", vector);
+	} else {
+		io("data", vector);
+		Eigen::array<Eigen::Index, NumIndices> dims;
+		for (int i = 0; i < NumIndices; ++i) 	
+			dims[i] = static_cast<Eigen::Index>(vsz[i]);
+		mat.resize(dims);
+		std::copy(vector.begin(), vector.end(), mat.data());
+	}
+}
+
 template <class T>
 void Jsonize(JsonIO &io, Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &mat) {
 	Array<T> vector;
@@ -130,25 +153,12 @@ void Jsonize(JsonIO &io, Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &mat) 
 	io("size", sz);
 	if(io.IsStoring()) {
 		vector.SetCount(int(sz.cx)*int(sz.cy));
-		int i = 0;
-		for(int r = 0; r < mat.rows(); r++)
-			for(int c = 0; c < mat.cols(); c++) 
-				vector[i++] = mat(r, c);
+		Copy(mat, vector);
 		io("data", vector);
 	} else {
 		io("data", vector);
 		mat.resize(ptrdiff_t(sz.cy), ptrdiff_t(sz.cx));
-		int r = 0, c = 0;
-		for (int i = 0; i < vector.GetCount(); ++i) {
-			mat(r, c) = vector[i];
-			++c;
-			if (c == sz.cx) {
-				c = 0;
-				r++;
-			}
-			if (r == sz.cy)
-				break;
-		}
+		std::copy(vector.begin(), vector.end(), mat.data());
 	}
 }
 
@@ -159,14 +169,12 @@ void Jsonize(JsonIO &io, Eigen::Matrix<T, Eigen::Dynamic, 1> &vec) {
 	io("size", sz);
 	if(io.IsStoring()) {
 		vector.SetCount(int(sz));
-		for (int i = 0; i < sz; ++i)
-			vector[i] = vec(i);
+		Copy(vec, vector);
 		io("data", vector);
 	} else {
 		io("data", vector);
 		vec.resize(ptrdiff_t(sz));
-		for (int i = 0; i < vec.size(); ++i)
-			vec(i) = vector[i];
+		Copy(vector, vec);
 	}
 }
 
@@ -284,6 +292,36 @@ void Clear(std::vector<T> &v) {v.clear();}
 #define PostPad ResizeConservative
 
 
+template <typename T>
+auto Begin(const std::vector<T> &v)		{return v.begin();}
+template <typename T>
+auto Begin(std::vector<T> &v)			{return v.begin();}
+template <typename T>
+auto End(const std::vector<T> &v)		{return v.end();}
+template <typename T>
+auto End(std::vector<T> &v)				{return v.end();}
+
+template <typename T>
+auto Begin(const Eigen::Matrix<T, Eigen::Dynamic, 1> &v){return v.data();}
+template <typename T>
+auto Begin(Eigen::Matrix<T, Eigen::Dynamic, 1> &v)		{return v.data();}
+template <typename T>
+auto End(const Eigen::Matrix<T, Eigen::Dynamic, 1> &v)	{return v.data() + v.size();}
+
+template <typename T>
+auto Begin(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &v)	{return v.data();}
+template <typename T>
+auto Begin(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &v)			{return v.data();}
+template <typename T>
+auto End(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &v)		{return v.data() + v.size();}
+
+template <typename T, int NumIndices>
+auto Begin(const Eigen::Tensor<T, NumIndices> &v)		{return v.data();}
+template <typename T, int NumIndices>
+auto Begin(Eigen::Tensor<T, NumIndices> &v)				{return v.data();}
+template <typename T, int NumIndices>
+auto End(const Eigen::Tensor<T, NumIndices> &v)			{return v.data() + v.size();}
+
 template <class Range>
 auto Begin(const Range &v)				{return v.Begin();}
 template <class Range>
@@ -293,19 +331,6 @@ auto End(const Range &v)				{return v.End();}
 template <class Range>
 auto End(Range &v)						{return v.End();}
 
-template <typename T>
-auto Begin(const std::vector<T> &v)		{return v.begin();}
-template <typename T>
-auto Begin(std::vector<T> &v)			{return v.begin();}
-template <typename T>
-auto End(const std::vector<T> &v)		{return v.end();}
-
-template <typename T>
-auto Begin(const Eigen::Matrix<T, Eigen::Dynamic, 1> &v){return v.data();}
-template <typename T>
-auto Begin(Eigen::Matrix<T, Eigen::Dynamic, 1> &v)		{return v.data();}
-template <typename T>
-auto End(const Eigen::Matrix<T, Eigen::Dynamic, 1> &v)	{return v.data() + v.size();}
 
 template <class Range>
 auto &First(Range &data) {return data[0];}
