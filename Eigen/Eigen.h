@@ -133,7 +133,7 @@ void Jsonize(JsonIO &io, Eigen::Tensor<T, NumIndices> &mat) {
 		vsz[i] = mat.dimension(i);
 	io("size", vsz);
 	if(io.IsStoring()) {
-		vector.SetCount(mat.size());
+		vector.SetCount(int(mat.size()));
 		Copy(mat, vector);
 		io("data", vector);
 	} else {
