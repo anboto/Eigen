@@ -10,6 +10,7 @@ file
 	Eigen.cpp,
 	Eigen.h,
 	ToStringPlugin.h,
+	MultiDimMatrix.cpp,
 	MultiDimMatrix.h,
 	src.tpp,
 	srcdoc.tpp;

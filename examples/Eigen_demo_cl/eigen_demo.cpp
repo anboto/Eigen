@@ -936,6 +936,8 @@ CONSOLE_APP_MAIN
 	#ifdef flagDEBUG
 	Cout() << "\nPress enter key to end";
 	ReadStdIn();
+	#else
+	Cout() << "\nPress enter key to end";
 	#endif   
 }
 

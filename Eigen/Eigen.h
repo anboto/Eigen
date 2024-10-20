@@ -497,7 +497,26 @@ inline void Remove(Range &d, int id) {
 }
 
 template <class T>
-bool IsNull(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &a) {return a.size() == 0;}
+bool IsNum(const Eigen::Matrix<T, Eigen::Dynamic, 1> &a) {
+	if (a.size() == 0)
+		return false;
+	for (int i = 0; i < a.size(); ++i) {
+		if (IsNull<T>(a(i)))
+			return false;
+	}
+	return true;
+}
+
+template <class T>
+bool IsNum(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &a) {
+	if (a.size() == 0)
+		return false;
+	for (int i = 0; i < a.size(); ++i) {
+		if (IsNull(a.array()(i)))
+			return false;
+	}
+	return true;
+}
 
 #define EigenNull	Eigen::MatrixXd()
 

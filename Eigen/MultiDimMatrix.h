@@ -314,12 +314,17 @@ public:
 	const T *begin() const		{return d.begin();}
 	T *begin() 					{return d.begin();}
 	
+	const T &array(int i) const	{return d[i];}
+	T &array(int i)				{return d[i];}
+	
 	void ColMajor(bool c = true){index.ColMajor(c);}
 	void RowMajor(bool c = true){index.RowMajor(c);}
 	
 	int size() const			{return index.size();}
 	int size(int dim) const		{return index.size(dim);}
 	bool IsEmpty() const		{return index.IsEmpty();}
+	
+	bool IsNullInstance() const;
 
 	void Xmlize(XmlIO xml) {
 		xml
@@ -337,6 +342,13 @@ protected:
     Buffer<T> d;
 	MultiDimMatrixIndex index;
 };
+
+template <>
+bool MultiDimMatrix<Eigen::Matrix<double, -1, -1>>::IsNullInstance() const;
+
+template <>
+bool MultiDimMatrix<Eigen::Matrix<double, -1, 1>>::IsNullInstance() const;
+
 
 template <class T>
 class MultiDimMatrixRowMajor : public MultiDimMatrix<T> {
@@ -366,6 +378,11 @@ void ColMajorToRowMajor(const T *d_col, T *d_row, const Vector<int> &dims) {
 	do {
 		d_row[row.GetIndex(idx)] = d_col[col.GetIndex(idx)];
 	} while(row.IncrementIndex(idx));
+}
+
+template <typename T>
+bool IsNum(const MultiDimMatrix<T> &a) {
+	return !a.IsNullInstance();
 }
 
 }
