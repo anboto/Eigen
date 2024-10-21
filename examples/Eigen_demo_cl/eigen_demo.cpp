@@ -929,6 +929,24 @@ CONSOLE_APP_MAIN
 		}
 	}
 	
+	UppLog() << "\n\nIntegration with U++ tests";
+	{
+		VectorXd vec = VectorXd::Constant(20, 2.5);	
+		VERIFY(IsNum(vec));
+		vec(5) = std::numeric_limits<double>::quiet_NaN();
+		VERIFY(!IsNum(vec));
+		vec = VectorXd();
+		VERIFY(!IsNum(vec));
+	}
+	{
+		MatrixXi mat = MatrixXi::Constant(20, 30, 25);		
+		VERIFY(IsNum(mat));
+		mat(5, 5) = Null;
+		VERIFY(!IsNum(mat));
+		mat = MatrixXi();
+		VERIFY(!IsNum(mat));
+	}
+	
 	NonLinearTests();
 	
 	FFTTests();

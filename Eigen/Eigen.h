@@ -24,6 +24,7 @@
 #include <plugin/eigen/unsupported/Eigen/FFT>
 #include <plugin/eigen/unsupported/Eigen/CXX11/Tensor>
 
+#include <Functions4U/Defs.h>
 #include "MultiDimMatrix.h"
 
 namespace Upp {
@@ -501,7 +502,7 @@ bool IsNum(const Eigen::Matrix<T, Eigen::Dynamic, 1> &a) {
 	if (a.size() == 0)
 		return false;
 	for (int i = 0; i < a.size(); ++i) {
-		if (IsNull<T>(a(i)))
+		if (!IsNum(a(i)))
 			return false;
 	}
 	return true;
@@ -512,7 +513,7 @@ bool IsNum(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &a) {
 	if (a.size() == 0)
 		return false;
 	for (int i = 0; i < a.size(); ++i) {
-		if (IsNull(a.array()(i)))
+		if (!IsNum(a.array()(i)))
 			return false;
 	}
 	return true;

@@ -2,7 +2,8 @@ description "Template library for linear algebra\377B44,169,203";
 
 uses
 	Core,
-	plugin/eigen;
+	plugin/eigen,
+	Functions4U;
 
 options(MSC) /bigobj;
 
