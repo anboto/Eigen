@@ -15,7 +15,8 @@ public:
 	
 	void SetNumAxis(int numAxis)	   	{axisDim.SetCount(numAxis);};
 	inline int GetNumAxis() const  	   	{return axisDim.size();}
-	const Vector<int> &GetAxisDim()	   	{return axisDim;}
+	const Vector<int> &GetAxisDim()const{return axisDim;}
+	int GetAxisDim(int dim)	const		{return axisDim[dim];}
 	
 	void SetAxisDim(int axis, int dim) {
 		ASSERT(axis >= 0 && axis < axisDim.size() && dim > 0);
@@ -117,7 +118,7 @@ public:
 	}
 		
 	template<typename... Args>
-	inline int operator()(Args... args) const 	{return GetIndex(args...);}
+	inline int operator()(Args... args) const 		{return GetIndex(args...);}
 	
 	inline int operator()(int row, int col) const  	{return GetIndex(row, col);}
 		
@@ -214,6 +215,7 @@ public:
 		index.SetAxis(dim);
 		d.Alloc(index.size());
 	}
+	
 	void Clear() {
 		index.Clear();
 		d.Clear();
@@ -225,7 +227,8 @@ public:
 	
 	void SetNumAxis(int numAxis)	   	{index.SetNumAxis(numAxis);};
 	inline int GetNumAxis() const  	   	{return index.GetNumAxis();}
-	const Vector<int> &GetAxisDim()	   	{return index.GetAxisDim();}
+	const Vector<int> &GetAxisDim()const{return index.GetAxisDim();}
+	int GetAxisDim(int dim)	const		{return index.GetAxisDim(dim);}
 	
 	MultiDimMatrix &SetZero() {
 		memset(d.begin(), 0, size()*sizeof(T));
