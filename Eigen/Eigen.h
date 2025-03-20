@@ -432,22 +432,30 @@ void Swap(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &A1, Eigen::Matrix<T,
 }
 
 template <typename T>
-inline Eigen::Matrix<T, Eigen::Dynamic, 1> Segment(const Eigen::Matrix<T, Eigen::Dynamic, 1> &d, int ifrom, int num) {
+inline Eigen::Matrix<T, Eigen::Dynamic, 1> Segment(const Eigen::Matrix<T, Eigen::Dynamic, 1> &d, int ifrom, int num = -1) {
+	if (num < 0)
+		num = d.size()- ifrom;
 	return d.segment(ifrom, num);
 }
 
 template <typename T>
-inline std::vector<T> Segment(const std::vector<T> &d, int ifrom, int num) {
+inline std::vector<T> Segment(const std::vector<T> &d, int ifrom, int num = -1) {
+	if (num < 0)
+		num = d.size()- ifrom;
 	return std::vector<T>(d.begin() + ifrom, d.begin() + ifrom + num);
 }
 
 template <class Range>
-inline Range Segment(const Range &d, int ifrom, int num) {
+inline Range Segment(const Range &d, int ifrom, int num = -1) {
 	Range a;
-	if (ifrom + num >= d.size()) {
-		num = d.size() - ifrom;
-		if (num <= 0)
-			return a;
+	if (num < 0)
+		num = d.size()- ifrom;
+	else {
+		if (ifrom + num >= d.size()) {
+			num = d.size() - ifrom;
+			if (num <= 0)
+				return a;
+		}
 	}
 	Resize(a, num);
 	std::copy(Begin(d) + ifrom, Begin(d) + ifrom + num, Begin(a));
