@@ -6,22 +6,22 @@
 namespace Upp {
 
 using namespace Eigen;
-	
+
 bool NonLinearOptimization(VectorXd &y, Eigen::Index numData, 
 			Function <int(const VectorXd &b, VectorXd &residual)> Residual,
-			double xtol, double ftol, int maxfev) {
-	Basic_functor functor(Residual);
+			double xtol, double ftol, int maxfev, int &ret) {
+	BasicNonLinearOptimizationFunctor functor(Residual);
 	functor.unknowns = y.size();
 	functor.datasetLen = numData;
-	Eigen::NumericalDiff<Basic_functor> numDiff(functor);
-	Eigen::LevenbergMarquardt<Eigen::NumericalDiff<Basic_functor> > lm(numDiff);
+	Eigen::NumericalDiff<BasicNonLinearOptimizationFunctor> numDiff(functor);
+	Eigen::LevenbergMarquardt<Eigen::NumericalDiff<BasicNonLinearOptimizationFunctor>> lm(numDiff);
 	if (!IsNull(xtol))
 		lm.parameters.xtol *= xtol;
 	if (!IsNull(ftol))
 		lm.parameters.ftol *= ftol;
 	if (!IsNull(maxfev))
 		lm.parameters.maxfev = maxfev;
-	int ret = lm.minimize(y);
+	ret = lm.minimize(y);
 	if (ret == Eigen::LevenbergMarquardtSpace::ImproperInputParameters || 
 		ret == Eigen::LevenbergMarquardtSpace::TooManyFunctionEvaluation ||
 		ret == Eigen::LevenbergMarquardtSpace::CosinusTooSmall) 
@@ -29,10 +29,35 @@ bool NonLinearOptimization(VectorXd &y, Eigen::Index numData,
 	return true;
 }
 
+bool NonLinearOptimization(VectorXd &y, Eigen::Index numData, 
+			Function <int(const VectorXd &b, VectorXd &residual)> Residual,
+			double xtol, double ftol, int maxfev) {
+	int ret;
+	return NonLinearOptimization(y, numData, Residual, xtol, ftol, maxfev, ret);
+}
+
+String NonLinearOptimizationError(int error) {
+	switch(error) {
+	case Eigen::LevenbergMarquardtSpace::NotStarted:						return "StatusNotStarted";
+	case Eigen::LevenbergMarquardtSpace::Running:							return "Running";
+	case Eigen::LevenbergMarquardtSpace::ImproperInputParameters:			return "Improper input parameters";
+	case Eigen::LevenbergMarquardtSpace::RelativeReductionTooSmall:			return "Relative reduction too small";
+	case Eigen::LevenbergMarquardtSpace::RelativeErrorTooSmall:				return "Relative error too small";
+	case Eigen::LevenbergMarquardtSpace::RelativeErrorAndReductionTooSmall:	return "Relative error and reduction too small";
+	case Eigen::LevenbergMarquardtSpace::CosinusTooSmall:					return "Cosinus too small";
+	case Eigen::LevenbergMarquardtSpace::TooManyFunctionEvaluation:			return "Too many function evaluations";
+	case Eigen::LevenbergMarquardtSpace::FtolTooSmall:						return "Ftol too small";
+	case Eigen::LevenbergMarquardtSpace::XtolTooSmall:						return "Xtol too small";
+	case Eigen::LevenbergMarquardtSpace::GtolTooSmall:						return "Gtol too small";
+	case Eigen::LevenbergMarquardtSpace::UserAsked:							return "User asked";
+	}
+	return "Unknown code";
+}
+
 bool SolveNonLinearEquations(VectorXd &y, Function <int(const VectorXd &b, VectorXd &residual)> Residual,
 			double xtol, int maxfev, double factor) {
-	Basic_functor functor(Residual);
-	HybridNonLinearSolver<Basic_functor> solver(functor);
+	BasicNonLinearOptimizationFunctor functor(Residual);
+	HybridNonLinearSolver<BasicNonLinearOptimizationFunctor> solver(functor);
 	if (!IsNull(xtol))
 		solver.parameters.xtol *= xtol;
 	if (!IsNull(maxfev))

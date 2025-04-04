@@ -59,8 +59,8 @@ struct NonLinearOptimizationFunctor {
 	virtual void operator() (const InputType& , ValueType* , JacobianType*  = 0) const {};
 };
 
-struct Basic_functor : NonLinearOptimizationFunctor<double> {
-	Basic_functor(Function <int(const Eigen::VectorXd &b, Eigen::VectorXd &err)> _function) : function(_function) {}
+struct BasicNonLinearOptimizationFunctor : NonLinearOptimizationFunctor<double> {
+	BasicNonLinearOptimizationFunctor(Function <int(const Eigen::VectorXd &b, Eigen::VectorXd &err)> _function) : function(_function) {}
 	int operator()(const Eigen::VectorXd &b, Eigen::VectorXd &fvec) const {return function(b, fvec);}
 	Function <int(const Eigen::VectorXd &b, Eigen::VectorXd &err)> function;
 };
@@ -68,6 +68,11 @@ struct Basic_functor : NonLinearOptimizationFunctor<double> {
 bool NonLinearOptimization(Eigen::VectorXd &y, Eigen::Index numData, 
 			Function <int(const Eigen::VectorXd &y, Eigen::VectorXd &residual)>residual,
 			double xtol = Null, double ftol = Null, int maxfev = Null);
+bool NonLinearOptimization(Eigen::VectorXd &y, Eigen::Index numData, 
+			Function <int(const Eigen::VectorXd &b, Eigen::VectorXd &residual)> Residual,
+			double xtol, double ftol, int maxfev, int &ret);
+String NonLinearOptimizationError(int error);
+
 bool SolveNonLinearEquations(Eigen::VectorXd &y, Function <int(const Eigen::VectorXd &b, Eigen::VectorXd &residual)> Residual,
 			double xtol = Null, int maxfev = Null, double factor = Null);
 double SolveNonLinearEquation(double y, Function <double(double b)> Residual, double xtol = Null, int maxfev = Null, double factor = Null);
