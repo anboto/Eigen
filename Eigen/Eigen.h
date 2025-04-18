@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// Copyright 2021 - 2022, the Anboto author and contributors
+// Copyright 2021 - 2025, the Anboto author and contributors
 #ifndef _Eigen_Eigen_h
 #define _Eigen_Eigen_h
 
@@ -439,7 +439,7 @@ void Swap(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &A1, Eigen::Matrix<T,
 template <typename T>
 inline Eigen::Matrix<T, Eigen::Dynamic, 1> Segment(const Eigen::Matrix<T, Eigen::Dynamic, 1> &d, int ifrom, int num = -1) {
 	if (num < 0)
-		num = d.size()- ifrom;
+		num = (int)d.size()- ifrom;
 	return d.segment(ifrom, num);
 }
 

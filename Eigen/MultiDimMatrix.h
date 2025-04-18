@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// Copyright 2021 - 2024, the Anboto author and contributors
+// Copyright 2021 - 2025, the Anboto author and contributors
 #ifndef _ScatterDraw_MultiDimMatrix_h_
 #define _ScatterDraw_MultiDimMatrix_h_
 
