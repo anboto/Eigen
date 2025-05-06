@@ -249,7 +249,7 @@ template <class Range>
 void Clear(Range &v) {v.Clear();}
 
 template <typename T>
-void Resize(Eigen::Matrix<T, Eigen::Dynamic, 1> &v, size_t len) {v.resize(len);}
+void Resize(Eigen::Matrix<T, Eigen::Dynamic, 1> &v, size_t len) {v.resize((Eigen::Index)len);}
 template <typename T>
 void Resize(Eigen::Matrix<T, Eigen::Dynamic, 1> &v, size_t len, const T& init) {v.setConstant(len, 1, init);}
 template <typename T>
@@ -410,7 +410,7 @@ void CopyRowMajor(const Eigen::Matrix<typename Range::value_type, Eigen::Dynamic
 
 template <class Range1, class Range2>
 void Copy(const Range1& in, Range2 &out) {
-	Resize(out, in.size());
+	Resize(out, (size_t)in.size());
 	std::copy(Begin(in), End(in), Begin(out));
 }
 
