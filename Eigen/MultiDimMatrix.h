@@ -122,7 +122,9 @@ public:
 	
 	inline int operator()(int row, int col) const  	{return GetIndex(row, col);}
 		
-	bool IsValid(const Vector<int> &idx) const {		
+	bool IsValid(const Vector<int> &idx) const {
+		if (idx.size() != axisDim.size())
+			return false;		
 		for (int ix = 0; ix < axisDim.size(); ++ix) 
 			if (idx[ix] < 0 && idx[ix] >= axisDim[ix])
 				return false;
@@ -138,9 +140,13 @@ public:
 	    return IsValid(index);
 	}	
 	inline bool IsValid(int row, int col) const  {
+		if (axisDim.size() != 2)
+			return false;
 		return row >= 0 && row < axisDim[0] && col >= 0 && col < axisDim[1];
 	}
 	inline bool IsValid(int row) const  {
+		if (axisDim.size() != 1)
+			return false;
 		return row >= 0 && row < axisDim[0];
 	}
 	int size() const {
@@ -386,6 +392,16 @@ void ColMajorToRowMajor(const T *d_col, T *d_row, const Vector<int> &dims) {
 template <typename T>
 bool IsNum(const MultiDimMatrix<T> &a) {
 	return !a.IsNullInstance();
+}
+
+template <class T>
+void Nvl2(MultiDimMatrix<T> &d, T val) {
+	if (d.IsEmpty())
+		return;
+	for (int i = 0; i < d.size(); ++i) {
+		if (!IsNum(d[i]))
+			d[i] = val;
+	}
 }
 
 }

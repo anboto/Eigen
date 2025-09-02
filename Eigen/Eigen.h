@@ -532,6 +532,24 @@ bool IsNum(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &a) {
 	return true;
 }
 
+template <class T>
+void Nvl2(Eigen::Matrix<T, Eigen::Dynamic, 1> &a, T val) {
+	if (a.size() == 0)
+		return;
+	for (int i = 0; i < a.size(); ++i)
+		if (!IsNum(a(i)))
+			a(i) = val;
+}
+
+template <class T>
+void Nvl2(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &a, T val) {
+	if (a.size() == 0)
+		return;
+	for (int i = 0; i < a.size(); ++i)
+		if (!IsNum(a.array()(i)))
+			a(i) = val;
+}
+
 #define EigenNull	Eigen::MatrixXd()
 
 template<typename T>
