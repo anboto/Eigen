@@ -415,6 +415,13 @@ void Copy(const Range1& in, Range2 &out) {
 }
 
 template <class Range1, class Range2>
+void AppendX(const Range1& in, Range2 &out) {		// Append is already used in Core/Obsolete
+	size_t outsize = (size_t)out.size();
+	ResizeConservative(out, (size_t)in.size() + outsize);
+	std::copy(Begin(in), End(in), Begin(out) + outsize);
+}
+
+template <class Range1, class Range2>
 void Block(Range1& in, Range2& out, int begin, int len) {
 	ASSERT(begin < in.size() && len > 0 && begin + len <= in.size());
 	Resize(out, len);

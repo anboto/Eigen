@@ -45,6 +45,7 @@ file
 	Eigen\src\CholmodSupport readonly separator,
 	Eigen\src\CholmodSupport\CholmodSupport.h,
 	Eigen\src\Core readonly separator,
+	Eigen\src\Core\util\IndexedViewHelper.h,
 	Eigen\src\Core\Array.h,
 	Eigen\src\Core\ArrayBase.h,
 	Eigen\src\Core\ArrayWrapper.h,

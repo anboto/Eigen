@@ -22,9 +22,9 @@ a simple weak copyleft license. Common questions about the MPL2
 are answered in the official ][^http`:`/`/www`.mozilla`.org`/MPL`/2`.0`/FAQ`.html^2 M
 PL2 FAQ][2 .]&]
 [s0;#2 &]
-[s0;# [2 Eigen package is a wrapper of Eigen library, updated to commit 
-fee5d60b (26/12/2023). It includes the library and helper functions 
-to integrate better Eigen with U`+`+, like:]&]
+[s0;# [2 Eigen package is a wrapper of Eigen library ][^https`:`/`/gitlab`.com`/libeigen`/eigen`/`-`/releases`/5`.0`.0^2 v
+ersion 5.0.0 (09/10/2025)][2 . It includes the library and helper 
+functions to integrate better Eigen with U`+`+, like:]&]
 [s0;#i150;O0; [^topic`:`/`/Eigen`/src`/NonLinear`_en`-us^2 Non linear 
 equations solving]&]
 [s0;#i150;O0; [^topic`:`/`/Eigen`/src`/MultiDimMatrix`_en`-us^2 MultiDimMatrix]&]

@@ -804,10 +804,10 @@ CONSOLE_APP_MAIN
 		
 		    Eigen::Tensor<float, 2> x1 = - matf;
 		    Eigen::Tensor<int, 2> x2 = - mati;
-		    Eigen::Tensor<bool, 2> x3 = - matb;
+		    //Eigen::Tensor<bool, 2> x3 = - matb;		NEGATE IS NOT DEFINED FOR BOOLEAN TYPES
 		    UppLog() << "\n" << x1;
 		    UppLog() << "\n" << x2;
-		    UppLog() << "\n" << x3;
+		    //UppLog() << "\n" << x3;
 		}
 		{
 		    Eigen::Tensor<float, 2> h(3, 3);
