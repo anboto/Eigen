@@ -17,6 +17,33 @@
 
 #define eigen_assert(x) ASSERT(x)
 
+#ifdef CPU_NEON
+namespace {
+    using Upp::float32x2_t;
+    using Upp::float32x4_t;
+    using Upp::int8x8_t;
+    using Upp::int8x16_t;
+    using Upp::uint8x8_t;
+    using Upp::uint8x16_t;
+    using Upp::int16x4_t;
+    using Upp::int16x8_t;
+    using Upp::uint16x4_t;
+    using Upp::uint16x8_t;
+    using Upp::int32x2_t;
+    using Upp::int32x4_t;
+    using Upp::uint32x2_t;
+    using Upp::uint32x4_t;
+    using Upp::int64x2_t;
+    using Upp::uint64x2_t;
+
+    using Upp::vdup_n_f32;
+    using Upp::vdupq_n_f32;
+    using Upp::vget_lane_s32;
+    using Upp::vreinterpret_s32_s8;
+    using Upp::vdup_n_s8;
+}
+#endif 
+
 #undef Success  
 #include <plugin/eigen/Eigen/Dense>
 #include <plugin/eigen/unsupported/Eigen/NonLinearOptimization>
