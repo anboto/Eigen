@@ -41,6 +41,24 @@ namespace {
     using Upp::vget_lane_s32;
     using Upp::vreinterpret_s32_s8;
     using Upp::vdup_n_s8;
+    using Upp::vget_low_s32;
+    using Upp::vdupq_n_s8;
+    using Upp::vdup_n_u8;
+    using Upp::vreinterpret_u32_u8;
+    using Upp::vdup_n_u8;
+    using Upp::vdupq_n_u8;
+    using Upp::vdup_n_s16;
+    using Upp::vdupq_n_s16;
+    using Upp::vdup_n_u16;
+    using Upp::vdupq_n_u16;
+    using Upp::vdup_n_s32;
+    using Upp::vdupq_n_s32;
+    using Upp::vdup_n_u32;
+    using Upp::vdupq_n_u32;
+    using Upp::vdupq_n_s64;
+    using Upp::vdupq_n_u64;
+    using Upp::vdup_n_u32;
+    using Upp::vreinterpret_f32_u32;
 }
 #endif 
 
