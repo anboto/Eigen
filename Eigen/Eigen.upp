@@ -11,6 +11,7 @@ file
 	Eigen.cpp,
 	Eigen.h,
 	ToStringPlugin.h,
+	NeonTypes.h,
 	MultiDimMatrix.cpp,
 	MultiDimMatrix.h,
 	src.tpp,
