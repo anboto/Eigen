@@ -419,6 +419,12 @@ void Copy(const Range1& in, Range2 &out) {
 	std::copy(Begin(in), End(in), Begin(out));
 }
 
+template <typename T, class Range>
+void Copy(const T* in, size_t size, Range &out) {
+	Resize(out, size);
+	std::copy(in, in + size, Begin(out));
+}
+
 template <class Range1, class Range2>
 void AppendX(const Range1& in, Range2 &out) {		// Append is already used in Core/Obsolete
 	size_t outsize = (size_t)out.size();

@@ -11,8 +11,34 @@ class MultiDimMatrixIndex {
 public:
 	MultiDimMatrixIndex()			   	{};
 	template<typename... Args>
-	MultiDimMatrixIndex(Args... args)  	{SetAxis(args...);}
+	MultiDimMatrixIndex(int t, Args... args)  	{SetAxis(t, args...);}
 	
+	MultiDimMatrixIndex(const MultiDimMatrixIndex& o) noexcept {Copy(o); }
+    MultiDimMatrixIndex& operator=(const MultiDimMatrixIndex& o) noexcept { 
+    	Clear(); 
+    	Copy(o); 
+    	return *this; 
+    }
+    
+	MultiDimMatrixIndex(MultiDimMatrixIndex&& o) noexcept {Move(o); }
+    MultiDimMatrixIndex& operator=(MultiDimMatrixIndex&& o) noexcept { 
+    	if (this != &o) {
+    		Clear(); 
+    		Move(o); 
+    	} 
+    	return *this; 
+    }
+    
+    void Move(MultiDimMatrixIndex& data) {
+        axisDim = pick(data.axisDim);
+		colMajor = data.colMajor;
+    }
+    void Copy(const MultiDimMatrixIndex& data) {
+        axisDim = clone(data.axisDim);
+		colMajor = data.colMajor;
+    }
+    
+    
 	void SetNumAxis(int numAxis)	   	{axisDim.SetCount(numAxis);};
 	inline int GetNumAxis() const  	   	{return axisDim.size();}
 	const Vector<int> &GetAxisDim()const{return axisDim;}
@@ -206,11 +232,36 @@ class MultiDimMatrix {
 public:
 	MultiDimMatrix()			  	{};
 	template<typename... Args>
-	MultiDimMatrix(Args... args) {
-		index.SetAxis(args...);
+	MultiDimMatrix(int t, Args... args) {
+		index.SetAxis(t, args...);
 		d.Alloc(index.size());
 	}
 	
+	MultiDimMatrix(const MultiDimMatrix& o) noexcept {Copy(o); }
+    MultiDimMatrix& operator=(const MultiDimMatrix& o) noexcept { 
+    	Clear(); 
+    	Copy(o); 
+    	return *this; 
+    }
+    
+	MultiDimMatrix(MultiDimMatrix&& o) noexcept {Move(o); }
+    MultiDimMatrix& operator=(MultiDimMatrix&& o) noexcept { 
+    	if (this != &o) {
+    		Clear(); 
+    		Move(o); 
+    	} 
+    	return *this; 
+    }
+    
+    void Move(MultiDimMatrix& data) {
+        d = pick(data.d);
+		index = pick(data.index);
+    }
+    void Copy(const MultiDimMatrix& data) {
+        d = clone(data.d);
+		index = clone(data.index);
+    }
+    
 	template<typename... Args>
 	void Resize(int t, Args... args) {
 		index.SetAxis(t, args...);
