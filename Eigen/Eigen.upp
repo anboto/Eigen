@@ -7,6 +7,8 @@ uses
 
 options(MSC) /bigobj;
 
+options(CLANG & PEDANTIC) "-Wall -Wextra -Wunused-parameter -Wlogical-op-parentheses -Wdeprecated-copy-with-user-provided-copy -Woverloaded-virtual -Wmissing-braces -Wshadow -Wimplicit-fallthrough -Wsign-conversion -Wformat=2";
+
 file
 	Eigen.cpp,
 	Eigen.h,
