@@ -368,32 +368,26 @@ void ReverseX(Range &v) {		// To avoid problem with Upp
 
 template <typename T>			
 void Rotate(std::vector<T> &v, int shift) {
-	if (shift > 0)
-		std::rotate(v.begin(), v.begin() + shift, v.end());
-	else if (shift < 0)
-		std::rotate(v.rbegin(), v.rbegin() - shift, v.rend());
+    int n = v.size();
+    if (n == 0) 
+    	return;
+
+    if ((shift = ((shift%n) + n)%n) == 0)
+        return;
+
+    std::rotate(v.begin(), v.begin() + shift, v.end());
 }
 
 template <class Range>			
-void Rotate(Range &v, int k) {
-	auto rotate = [](Range &v, int start, int end) {
-	    while (start < end) {
-	        Swap(v[start], v[end]);
-	        start++;
-	        end--;
-	    }
-	};
-	int n = v.size();
-	k = k % n;  // Handle cases where k is greater than the array size
-	if (k > 0) {
-	    rotate(v, 0, n - 1);
-	    rotate(v, 0, k - 1);
-	    rotate(v, k, n - 1);
-	} else if (k > 0) {
-	    rotate(v, 0, k - 1);
-	    rotate(v, k, n - 1);
-	    rotate(v, 0, n - 1);
-	}
+void Rotate(Range &v, int shift) {
+    int n = v.size();
+    if (n == 0) 
+    	return;
+
+    if ((shift = ((shift%n) + n)%n) == 0)
+        return;
+
+    std::rotate(v.begin(), v.begin() + shift, v.end());
 }
 
 template <class Range>
