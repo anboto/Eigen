@@ -152,7 +152,7 @@ public:
 		if (idx.size() != axisDim.size())
 			return false;		
 		for (int ix = 0; ix < axisDim.size(); ++ix) 
-			if (idx[ix] < 0 && idx[ix] >= axisDim[ix])
+			if (idx[ix] < 0 || idx[ix] >= axisDim[ix])
 				return false;
 		return true;
 	}
