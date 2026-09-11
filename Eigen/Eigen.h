@@ -275,7 +275,7 @@ void Clear(Eigen::Tensor<T, NumIndices_> &m) 					{m = Eigen::Tensor<T, NumIndic
 
 template <typename T>
 void PrePad(Eigen::Matrix<T, Eigen::Dynamic, 1> &v, size_t len, const T& init) {
-	size_t len0 = v.size();
+	size_t len0 = (size_t)v.size();
 	v.conservativeResize(len);
 	if (len > len0) {
 		size_t delta = len - len0;

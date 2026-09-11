@@ -265,12 +265,12 @@ public:
 	template<typename... Args>
 	void Resize(int t, Args... args) {
 		index.SetAxis(t, args...);
-		d.Alloc(index.size());
+		d.Alloc((size_t)index.size());
 	}
 	
 	void Resize(const Vector<int> &dim) {
 		index.SetAxis(dim);
-		d.Alloc(index.size());
+		d.Alloc((size_t)index.size());
 	}
 	
 	void Clear() {
