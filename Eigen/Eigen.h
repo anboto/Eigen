@@ -366,6 +366,15 @@ void ReverseX(Range &v) {		// To avoid problem with Upp
 		Swap(*first++, *last);
 }
 
+template <typename T>
+void SetZero(T &&obj) {
+	using D = std::decay_t<T>;
+	if constexpr (std::is_base_of<Eigen::EigenBase<D>, D>::value)	// To avoid problems with Eigen containers
+		obj.setZero();
+	else
+		Upp::Zero(obj);
+}
+
 template <typename T>			
 void Rotate(std::vector<T> &v, int shift) {
     int n = v.size();
